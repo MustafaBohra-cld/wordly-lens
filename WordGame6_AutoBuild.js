@@ -1,4 +1,4 @@
-// WordGame6_AutoBuild_v77.js - Lens Studio (classic JavaScript)
+// WordGame6_AutoBuild_v78.js - Lens Studio (classic JavaScript)
 // v44 2026-11-07: FRESH build (user deleted all textures).
 // Same wide layout as v43. BINDINGS - fill these in the
 // Inspector after importing the 6 fresh PNGs:
@@ -118,25 +118,33 @@
 // @input Asset.Texture panelTexture // v59: black panel background for Stats (panel-black.png)
 // @input Asset.Texture rulesPanelTexture // v62: tall black panel for Rules (panel-black-rules.png)
 // @input Asset.Texture countdownTexture // v73: black countdown pill, Stats-panel width, with clock icon (pill-black-stats.png)
+// @input Asset.Texture buttonTexture // v78: Morning Paper - round ink circle for Rules/Stats buttons (button-ink-round.png)
+// @input Asset.Texture redRuleTexture // v78: Morning Paper - thin red masthead rule under the title (red-rule.png)
 // @input SceneObject templateMsgObj
 // @input string[] wordList = {"PLANET", "GARDEN", "BRIDGE", "CASTLE", "MARKET", "SILVER", "GOLDEN", "WINTER", "SUMMER", "SPRING", "AUTUMN", "BANANA", "ORANGE", "PURPLE", "JUNGLE", "DESERT", "ISLAND", "BREEZE", "MEADOW", "FOREST", "HARBOR", "LETTER", "NUMBER", "PEOPLE", "FAMILY", "FRIEND", "SCHOOL", "TRAVEL", "DANCER", "SINGER", "PLAYER", "WINNER", "SUNSET", "STARRY", "CLOUDY", "FLOWER", "POCKET", "BUTTON", "WINDOW", "PENCIL", "HAMMER", "LADDER", "ROCKET", "DRAGON", "WIZARD", "KNIGHT", "PIRATE", "SAILOR", "FARMER", "DOCTOR", "LAWYER", "WORKER", "DRIVER", "RUNNER", "JUMPER", "HUNTER", "FISHER", "ARTIST", "WRITER", "READER", "LISTEN"}
 
 var ROWS = 5; // v32: 5 guesses, not 6
 var COLS = 6;
 
-var BLUE = new vec4(0.39, 0.40, 0.95, 1.0); // v32: pleasing indigo #6366f1 (was 0.23,0.51,0.86)
-var YELLOW = new vec4(0.98, 0.75, 0.14, 1.0); // v32: warm amber #fbbf24 (was 0.98,0.65,0.12)
+var BLUE = new vec4(0.08, 0.50, 0.24, 1.0); // v78: Morning Paper deep green #15803D (was indigo #6366f1)
+var YELLOW = new vec4(0.71, 0.33, 0.04, 1.0); // v78: Morning Paper warm ochre #B45309 (was amber #fbbf24)
 // v10: GREY was 0.62 — white letters on light grey were faint.
 // Darker now so white letters pop, like the reference.
-var GREY = new vec4(0.61, 0.64, 0.69, 1.0); // v32: soft grey #9ca3af (was 0.45,0.48,0.52)
-var KEY_GREY = new vec4(1, 1, 1, 1.0); // v58: WHITE unplayed keys - the bordered key texture (key-white-border.png) supplies the grey edge (was warm light grey #d6d3d1)
-var INDIGO = new vec4(0.39, 0.40, 0.95, 1.0); // v32: same indigo, for title/buttons/dots/ENTER
+var GREY = new vec4(0.84, 0.83, 0.82, 1.0); // v78: Morning Paper warm grey #D6D3D1 (was #9ca3af)
+var KEY_GREY = new vec4(0.98, 0.97, 0.95, 1.0); // v78: Morning Paper cream #FAF7F2 unplayed keys (was white)
+var INDIGO = new vec4(0.11, 0.10, 0.09, 1.0); // v78: Morning Paper ink #1C1917 (was indigo #6366f1)
+var INK = new vec4(0.11, 0.10, 0.09, 1.0); // v78: Morning Paper ink #1C1917
+var CREAM = new vec4(0.98, 0.97, 0.95, 1.0); // v78: Morning Paper cream #FAF7F2
+var RED = new vec4(0.73, 0.11, 0.11, 1.0); // v78: Morning Paper masthead red #B91C1C
+var MUTED = new vec4(0.47, 0.44, 0.42, 1.0); // v78: Morning Paper muted label #78716C
+var ABSENT_LETTER = new vec4(0.66, 0.64, 0.62, 1.0); // v78: Morning Paper absent letter #A8A29E
+var BODY_INK = new vec4(0.27, 0.25, 0.24, 1.0); // v78: Morning Paper body text #44403C
 var GLASS_TILE = new vec4(1.0, 1.0, 1.0, 0.55); // v32: glassy translucent white for empty tiles
 var GLASS_PILL = new vec4(1.0, 1.0, 1.0, 0.75); // v32: light glassy pill behind the message
 var DARKTEXT = new vec4(0.18, 0.06, 0.40, 1.0); // v32: dark plum for message text on the light pill
 var DOT_GREY = new vec4(0.61, 0.64, 0.69, 1.0); // v32: empty progress dots
 var WHITE = new vec4(1.0, 1.0, 1.0, 1.0);
-var TILE_GREY = new vec4(1, 1, 1, 1.0); // v58: WHITE unplayed tiles - the bordered tile texture (tile-white-border.png) supplies the grey edge, so white stays crisp even in sunlight (was light grey #D1D5DB)
+var TILE_GREY = new vec4(0.98, 0.97, 0.95, 1.0); // v78: Morning Paper cream #FAF7F2 unplayed tiles (was white)
 // v11: empty tiles were 0.80-0.85 — almost the same as the light
 // wall, so rows 2-6 looked missing. Only the scored row showed,
 // because it had a coloured background + letters. Empty tiles now
@@ -336,6 +344,7 @@ var introBodyText = null;
 var introPlayBg = null; // v74: PLAY pill button bg
 var introPlayTextObj = null; // v74: 'PLAY' text
 var introPlayText = null;
+var introRuleObjs = []; // v78: Morning Paper red rule(s) on the intro card
 var rulesTextComp = null;
 var rulesPanelObj = null;
 var statsPanelObj = null;
@@ -745,6 +754,7 @@ function setIntroVisible(v) {
     if (introBodyObj) { introBodyObj.enabled = v; }
     if (introPlayBg) { introPlayBg.enabled = v; }
     if (introPlayTextObj) { introPlayTextObj.enabled = v; }
+    for (var ri = 0; ri < introRuleObjs.length; ri++) { if (introRuleObjs[ri]) { introRuleObjs[ri].enabled = v; } } // v78: red rule follows the intro
     updateBoardLetters();
 }
 function setRulesPanelVisible(v) {
@@ -781,7 +791,7 @@ function toggleRules() {
     panelOpen = "rules";
     setStatsPanelVisible(false);
     if (rulesPanelText) {
-        rulesPanelText.text = "Guess the 6-letter word in 5 tries.\n\nBLUE = right letter, right place\nYELLOW = right letter, wrong place\nGREY = letter not in the word\n\nENTER submits, BACK deletes.";
+        rulesPanelText.text = "Guess the 6-letter word in 5 tries.\n\nGREEN = right letter, right place\nORANGE = right letter, wrong place\nGREY = letter not in the word\n\nENTER submits, BACK deletes.";
     }
     setRulesPanelVisible(true);
 }
@@ -861,10 +871,18 @@ function buildBoard() {
         if (titleText) {
             setTextSize(titleText, 72); // v53: WORDLY even bolder (was 64)
             noBg(titleText); // v49: NO box behind WORDLY (v47 setBg rendered white, not black)
-            titleText.textFill.color = INDIGO;
+            titleText.textFill.color = INK;
             try { titleText.horizontalAlignment = 1; } catch (e) { }
             titleText.text = "WORDLY";
-            setBold(titleText, INDIGO); // v36: bold
+            setBold(titleText, INK); // v78: Morning Paper ink (was indigo)
+        }
+        // v78: Morning Paper masthead rule - thin red line under the title.
+        if (script.templateBoxObj && script.redRuleTexture) {
+            var redRuleObj = copyUnder(script.orthoCamera, script.templateBoxObj, "TitleRedRule");
+            redRuleObj.enabled = true;
+            setPos(redRuleObj, 0, 0.77);
+            setAnchorSize(redRuleObj, 0.60, 0.03);
+            setIcon(getImageComp(redRuleObj), script.redRuleTexture);
         }
     }
     // v53: progress dots REMOVED (mustafa) - no dots are created.
@@ -890,11 +908,11 @@ function buildBoard() {
         setPos(countdownTextObj, 0.08, -0.30); // v73: re-centred in the narrower pill, clear of the clock icon
         setAnchorSize(countdownTextObj, 1.15, 0.12); // v73: was 1.55
         countdownText = getTextComp(countdownTextObj);
-        if (countdownText) { setTextSize(countdownText, 20); setBold(countdownText, WHITE); noBg(countdownText); countdownText.textFill.color = WHITE; try { countdownText.horizontalAlignment = 1; } catch (e) { } countdownText.text = ""; } // v69: font 20 bold like Daily's (was 18)
+        if (countdownText) { setTextSize(countdownText, 20); setBold(countdownText, WHITE); noBg(countdownText); countdownText.textFill.color = CREAM; try { countdownText.horizontalAlignment = 1; } catch (e) { } countdownText.text = ""; } // v78: Morning Paper cream on ink (was white)
         countdownTextObj.enabled = false;
         setAnchorSize(gameOverTextObj, 1.8, 0.25);
         gameOverText = getTextComp(gameOverTextObj);
-        if (gameOverText) { setTextSize(gameOverText, 44); styleBlock(gameOverText, 44); noBg(gameOverText); gameOverText.textFill.color = WHITE; try { gameOverText.horizontalAlignment = 1; } catch (e) { } gameOverText.text = ""; }
+        if (gameOverText) { setTextSize(gameOverText, 44); styleBlock(gameOverText, 44); noBg(gameOverText); gameOverText.textFill.color = INK; try { gameOverText.horizontalAlignment = 1; } catch (e) { } gameOverText.text = ""; } // v78: Morning Paper ink default; win sets green in finishFlip
         gameOverTextObj.enabled = false;
         var rulesObj = copyUnder(script.orthoCamera, script.templateMsgObj, "RulesText");
         rulesObj.enabled = true;
@@ -982,15 +1000,15 @@ function buildBoard() {
             kc.text = (letter === "BACK") ? (script.deleteIconTexture ? "" : "DEL") : letter; // v34: hide "DEL" when the icon is used
             if (letter === "ENTER") {
                 styleBlock(kc, 30); // v53: ENTER word a little bigger in the bigger pill (was 28)
-                setBold(kc, WHITE); // v48: bold white ENTER on the blue pill
+                setBold(kc, CREAM); // v78: Morning Paper cream ENTER on the ink pill
                 if (script.enterPillTexture) { noBg(kc); } // v35: the pill Image is the background
                 else { setBg(kc, INDIGO); } // fallback: Text pill
-                kc.textFill.color = WHITE;
+                kc.textFill.color = CREAM;
             } else {
                 styleBlock(kc, (letter === "BACK") ? 24 : BLOCK_FONT);
-                if (letter !== "BACK") { setBold(kc, BLACK); } // v45: bold letters, centred in the tile like Daily
+                if (letter !== "BACK") { setBold(kc, INK); } // v78: Morning Paper ink letters on cream keys
                 noBg(kc);
-                kc.textFill.color = BLACK;
+                kc.textFill.color = INK;
             }
         }
         keys.push(keyObj);
@@ -1013,7 +1031,8 @@ function buildBoard() {
     if (script.templateBoxObj) {
         var rbBoxObj = copyUnder(script.orthoCamera, script.templateBoxObj, "RulesBox");
         rbBoxObj.enabled = true; setPos(rbBoxObj, 0.89, 0.40); setAnchorSize(rbBoxObj, 0.16, 0.10); // v54: lifted up (was 0.30)
-        setBoxColor(getImageComp(rbBoxObj), INDIGO); // v32: indigo button (was black)
+        if (script.buttonTexture) { setIcon(getImageComp(rbBoxObj), script.buttonTexture); } // v78: Morning Paper round ink button
+        else { setBoxColor(getImageComp(rbBoxObj), INK); } // fallback: ink square
         // v33: SVG/PNG icon on top, if rulesIconTexture is filled
         // (import rules-icon.png). Falls back to "?" below if not.
         if (script.rulesIconTexture) {
@@ -1032,7 +1051,8 @@ function buildBoard() {
     if (script.templateBoxObj) {
         var sbBoxObj = copyUnder(script.orthoCamera, script.templateBoxObj, "StatsBox");
         sbBoxObj.enabled = true; setPos(sbBoxObj, 0.89, 0.28); setAnchorSize(sbBoxObj, 0.16, 0.10); // v54: lifted up (was 0.18)
-        setBoxColor(getImageComp(sbBoxObj), INDIGO); // v32: indigo button (was black)
+        if (script.buttonTexture) { setIcon(getImageComp(sbBoxObj), script.buttonTexture); } // v78: Morning Paper round ink button
+        else { setBoxColor(getImageComp(sbBoxObj), INK); } // fallback: ink square
         // v33: SVG/PNG icon on top, if statsIconTexture is filled
         // (import stats-icon.png). Falls back to "S" below if not.
         if (script.statsIconTexture) {
@@ -1061,7 +1081,7 @@ function buildBoard() {
         setPos(rulesTitleObj, 0, 0.30);
         setAnchorSize(rulesTitleObj, 1.4, 0.12);
         var rulesTitleText = getTextComp(rulesTitleObj);
-        if (rulesTitleText) { setTextSize(rulesTitleText, 28); noBg(rulesTitleText); rulesTitleText.textFill.color = WHITE; try { rulesTitleText.horizontalAlignment = 1; } catch (e) { } rulesTitleText.text = "HOW TO PLAY"; setBold(rulesTitleText, WHITE); }
+        if (rulesTitleText) { setTextSize(rulesTitleText, 28); noBg(rulesTitleText); rulesTitleText.textFill.color = INK; try { rulesTitleText.horizontalAlignment = 1; } catch (e) { } rulesTitleText.text = "HOW TO PLAY"; setBold(rulesTitleText, INK); }
         rulesTitleObj.enabled = false;
         // Swatches: blue W, yellow Y, grey F in a row.
         var swatchCols = [BLUE, YELLOW, GREY];
@@ -1078,7 +1098,7 @@ function buildBoard() {
             setPos(swTxtObj, swatchX[sw], 0.16);
             setAnchorSize(swTxtObj, 0.13, 0.10);
             var swTxt = getTextComp(swTxtObj);
-            if (swTxt) { swTxt.text = swatchLetters[sw]; styleBlock(swTxt, 24); setBold(swTxt, (sw === 1) ? BLACK : WHITE); noBg(swTxt); swTxt.textFill.color = (sw === 1) ? BLACK : WHITE; }
+            if (swTxt) { swTxt.text = swatchLetters[sw]; styleBlock(swTxt, 24); setBold(swTxt, (sw === 2) ? ABSENT_LETTER : WHITE); noBg(swTxt); swTxt.textFill.color = (sw === 2) ? ABSENT_LETTER : WHITE; }
             swTxtObj.enabled = false;
             ruleSwatches.push(swTxtObj);
         }
@@ -1086,13 +1106,13 @@ function buildBoard() {
         setPos(rulesPanelObj, 0, -0.08);
         setAnchorSize(rulesPanelObj, 1.25, 0.85);
         rulesPanelText = getTextComp(rulesPanelObj);
-        if (rulesPanelText) { setTextSize(rulesPanelText, 16); noBg(rulesPanelText); rulesPanelText.textFill.color = WHITE; try { rulesPanelText.horizontalAlignment = 0; } catch (e) { } }
+        if (rulesPanelText) { setTextSize(rulesPanelText, 16); noBg(rulesPanelText); rulesPanelText.textFill.color = BODY_INK; try { rulesPanelText.horizontalAlignment = 0; } catch (e) { } }
         rulesPanelObj.enabled = false;
         rulesXObj = copyUnder(script.orthoCamera, script.templateMsgObj, "RulesX");
         setPos(rulesXObj, 0.63, 0.30);
         setAnchorSize(rulesXObj, 0.12, 0.12);
         var rulesXText = getTextComp(rulesXObj);
-        if (rulesXText) { setTextSize(rulesXText, 26); noBg(rulesXText); rulesXText.textFill.color = WHITE; try { rulesXText.horizontalAlignment = 1; } catch (e) { } rulesXText.text = "X"; setBold(rulesXText, WHITE); }
+        if (rulesXText) { setTextSize(rulesXText, 26); noBg(rulesXText); rulesXText.textFill.color = INK; try { rulesXText.horizontalAlignment = 1; } catch (e) { } rulesXText.text = "X"; setBold(rulesXText, INK); }
         rulesXObj.enabled = false;
         bindButton(rulesXObj, closePanels);
         // --- Stats panel ---
@@ -1107,7 +1127,7 @@ function buildBoard() {
         setPos(statsTitleObj, 0, 0.18);
         setAnchorSize(statsTitleObj, 1.2, 0.12);
         var statsTitleText = getTextComp(statsTitleObj);
-        if (statsTitleText) { setTextSize(statsTitleText, 28); noBg(statsTitleText); statsTitleText.textFill.color = WHITE; try { statsTitleText.horizontalAlignment = 1; } catch (e) { } statsTitleText.text = "STATS"; setBold(statsTitleText, WHITE); }
+        if (statsTitleText) { setTextSize(statsTitleText, 28); noBg(statsTitleText); statsTitleText.textFill.color = INK; try { statsTitleText.horizontalAlignment = 1; } catch (e) { } statsTitleText.text = "STATS"; setBold(statsTitleText, INK); }
         statsTitleObj.enabled = false;
         // v60: Stats as a row (Daily style) - 5 columns, big
         // number on top, small label below. No multi-line text.
@@ -1118,14 +1138,14 @@ function buildBoard() {
             setPos(numObj, statColsX[sc], 0.09);
             setAnchorSize(numObj, 0.22, 0.12);
             var numText = getTextComp(numObj);
-            if (numText) { setTextSize(numText, 26); noBg(numText); numText.textFill.color = WHITE; try { numText.horizontalAlignment = 1; } catch (e) { } numText.text = "0"; setBold(numText, WHITE); statNumTexts.push(numText); }
+            if (numText) { setTextSize(numText, 26); noBg(numText); numText.textFill.color = INK; try { numText.horizontalAlignment = 1; } catch (e) { } numText.text = "0"; setBold(numText, INK); statNumTexts.push(numText); }
             numObj.enabled = false;
             statRowObjs.push(numObj);
             var labObj = copyUnder(script.orthoCamera, script.templateMsgObj, "StatLabel" + sc);
             setPos(labObj, statColsX[sc], 0.00);
             setAnchorSize(labObj, 0.22, 0.10);
             var labText = getTextComp(labObj);
-            if (labText) { setTextSize(labText, 14); noBg(labText); labText.textFill.color = WHITE; try { labText.horizontalAlignment = 1; } catch (e) { } labText.text = statLabels[sc]; }
+            if (labText) { setTextSize(labText, 14); noBg(labText); labText.textFill.color = MUTED; try { labText.horizontalAlignment = 1; } catch (e) { } labText.text = statLabels[sc]; }
             labObj.enabled = false;
             statRowObjs.push(labObj);
         }
@@ -1134,7 +1154,7 @@ function buildBoard() {
         setPos(statsXObj, 0.55, 0.18);
         setAnchorSize(statsXObj, 0.12, 0.12);
         var statsXText = getTextComp(statsXObj);
-        if (statsXText) { setTextSize(statsXText, 26); noBg(statsXText); statsXText.textFill.color = WHITE; try { statsXText.horizontalAlignment = 1; } catch (e) { } statsXText.text = "X"; setBold(statsXText, WHITE); }
+        if (statsXText) { setTextSize(statsXText, 26); noBg(statsXText); statsXText.textFill.color = INK; try { statsXText.horizontalAlignment = 1; } catch (e) { } statsXText.text = "X"; setBold(statsXText, INK); }
         statsXObj.enabled = false;
         bindButton(statsXObj, closePanels);
     }
@@ -1153,13 +1173,22 @@ function buildBoard() {
         setPos(introTitleObj, 0, 0.38);
         setAnchorSize(introTitleObj, 1.2, 0.12);
         introTitleText = getTextComp(introTitleObj);
-        if (introTitleText) { setTextSize(introTitleText, 40); setBold(introTitleText, INDIGO); noBg(introTitleText); introTitleText.textFill.color = INDIGO; try { introTitleText.horizontalAlignment = 1; } catch (e) { } introTitleText.text = "WORDLY"; }
+        if (introTitleText) { setTextSize(introTitleText, 40); setBold(introTitleText, INK); noBg(introTitleText); introTitleText.textFill.color = INK; try { introTitleText.horizontalAlignment = 1; } catch (e) { } introTitleText.text = "WORDLY"; }
+        // v78: Morning Paper masthead rule under the intro title too.
+        if (script.templateBoxObj && script.redRuleTexture) {
+            var introRuleObj = copyUnder(script.orthoCamera, script.templateBoxObj, "IntroRedRule");
+            setPos(introRuleObj, 0, 0.30);
+            setAnchorSize(introRuleObj, 0.50, 0.03);
+            setIcon(getImageComp(introRuleObj), script.redRuleTexture);
+            introRuleObj.enabled = false;
+            introRuleObjs.push(introRuleObj);
+        }
         introTitleObj.enabled = false;
         introBodyObj = copyUnder(script.orthoCamera, script.templateMsgObj, "IntroBody");
         setPos(introBodyObj, 0, 0.08);
         setAnchorSize(introBodyObj, 1.15, 0.30);
         introBodyText = getTextComp(introBodyObj);
-        if (introBodyText) { setTextSize(introBodyText, 19); noBg(introBodyText); introBodyText.textFill.color = WHITE; try { introBodyText.horizontalAlignment = 1; } catch (e) { } introBodyText.text = "Guess the 6-letter word in 5 tries!\n\nNew word every 24 hours!"; }
+        if (introBodyText) { setTextSize(introBodyText, 19); noBg(introBodyText); introBodyText.textFill.color = BODY_INK; try { introBodyText.horizontalAlignment = 1; } catch (e) { } introBodyText.text = "Guess the 6-letter word in 5 tries!\n\nNew word every 24 hours!"; }
         introBodyObj.enabled = false;
         if (script.templateBoxObj && script.enterPillTexture) {
             introPlayBg = copyUnder(script.orthoCamera, script.templateBoxObj, "IntroPlayBg");
@@ -1172,7 +1201,7 @@ function buildBoard() {
         setPos(introPlayTextObj, 0, -0.18);
         setAnchorSize(introPlayTextObj, 0.55, 0.14);
         introPlayText = getTextComp(introPlayTextObj);
-        if (introPlayText) { setTextSize(introPlayText, 22); setBold(introPlayText, WHITE); noBg(introPlayText); introPlayText.textFill.color = WHITE; try { introPlayText.horizontalAlignment = 1; } catch (e) { } introPlayText.text = "PLAY"; }
+        if (introPlayText) { setTextSize(introPlayText, 22); setBold(introPlayText, CREAM); noBg(introPlayText); introPlayText.textFill.color = CREAM; try { introPlayText.horizontalAlignment = 1; } catch (e) { } introPlayText.text = "PLAY"; }
         introPlayTextObj.enabled = false;
         // Tap PLAY (or the card) to dismiss and start playing.
         if (introPlayBg) { bindButton(introPlayBg, function () { setIntroVisible(false); }); }
@@ -1247,11 +1276,11 @@ function drawBoard() {
                 // cloning failed, the box stays white and the
                 // LETTER takes the score colour instead.
                 setTileBoxColor(box, bg); // v51: tall tile
-                if (boxColorWorks) { tile.textFill.color = (s[c] === 1) ? BLACK : WHITE; }
+                if (boxColorWorks) { tile.textFill.color = (s[c] === 0) ? ABSENT_LETTER : WHITE; } // v78: Morning Paper - present (ochre) gets white, absent (warm grey) gets muted
                 else { tile.textFill.color = bg; }
             } else if (r === guesses.length) {
                 setTileBoxColor(box, TILE_GREY); // v51: tall tile (was setBoxColor)
-                if (c < current.length) { tile.text = current[c]; tile.textFill.color = BLACK; }
+                if (c < current.length) { tile.text = current[c]; tile.textFill.color = INK; } // v78: Morning Paper ink on cream
                 else { tile.text = ""; tile.textFill.color = HIDDEN; } // v33: no "." dot
             } else {
                 setTileBoxColor(box, TILE_GREY); // v51: tall tile (was setBoxColor)
@@ -1279,12 +1308,12 @@ function drawBoard() {
         var st = keyStatus[kl];
         if (st === undefined) {
             setKeyBoxColor(k, KEY_GREY);
-            if (kt) { kt.textFill.color = BLACK; }
+            if (kt) { kt.textFill.color = INK; } // v78: Morning Paper ink on cream keys
         } else {
             var kbg = (st === 2) ? BLUE : (st === 1) ? YELLOW : GREY;
             if (boxColorWorks) {
                 setKeyBoxColor(k, kbg);
-                if (kt) { kt.textFill.color = (st === 1) ? BLACK : WHITE; }
+                if (kt) { kt.textFill.color = (st === 0) ? ABSENT_LETTER : WHITE; } // v78: Morning Paper - present white, absent muted
             } else {
                 if (kt) { kt.textFill.color = kbg; }
             }
@@ -1312,7 +1341,7 @@ function restoreToday() {
     if (gameOver) {
         // Show the game-over screen, exactly like finishFlip,
         // but do NOT call recordWin/recordLoss again.
-        if (gameOverText) { gameOverText.text = gameWon ? "You won!" : "Game over!"; }
+        if (gameOverText) { gameOverText.text = gameWon ? "You won!" : "Game over!"; gameOverText.textFill.color = gameWon ? BLUE : INK; } // v78: Morning Paper green win / ink loss
         if (gameOverTextObj) { gameOverTextObj.enabled = true; }
         if (countdownBgObj) { countdownBgObj.enabled = true; }
         if (countdownTextObj) { countdownTextObj.enabled = true; }
@@ -1371,7 +1400,7 @@ function finishFlip() {
         gameWon = true;
         recordWin();
         setKeyboardVisible(false); // v68: whole keyboard disappears on game over
-        if (gameOverText) { gameOverText.text = "You won!"; }
+        if (gameOverText) { gameOverText.text = "You won!"; gameOverText.textFill.color = BLUE; } // v78: Morning Paper green win
         if (gameOverTextObj) { gameOverTextObj.enabled = true; }
         if (countdownBgObj) { countdownBgObj.enabled = true; }
         if (countdownTextObj) { countdownTextObj.enabled = true; }
@@ -1382,7 +1411,7 @@ function finishFlip() {
         gameWon = false;
         recordLoss();
         setKeyboardVisible(false); // v68: whole keyboard disappears on game over
-        if (gameOverText) { gameOverText.text = "Game over!"; }
+        if (gameOverText) { gameOverText.text = "Game over!"; gameOverText.textFill.color = INK; } // v78: Morning Paper ink loss
         if (gameOverTextObj) { gameOverTextObj.enabled = true; }
         if (countdownBgObj) { countdownBgObj.enabled = true; }
         if (countdownTextObj) { countdownTextObj.enabled = true; }
@@ -1443,7 +1472,7 @@ function bindKeys() {
 function onStart() {
     boxColorWorks = testBoxColor();
     print("AutoBuild: box colour cloning works = " + boxColorWorks);
-    print("AutoBuild: v77 loaded (lens-sync test 2)");
+    print("AutoBuild: v78 loaded (Morning Paper)");
     loadStats();
     if (buildBoard()) {
         bindKeys();
