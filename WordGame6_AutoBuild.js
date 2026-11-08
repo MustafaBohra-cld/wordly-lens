@@ -1,4 +1,4 @@
-// WordGame6_AutoBuild_v75.js - Lens Studio (classic JavaScript)
+// WordGame6_AutoBuild_v76.js - Lens Studio (classic JavaScript)
 // v44 2026-11-07: FRESH build (user deleted all textures).
 // Same wide layout as v43. BINDINGS - fill these in the
 // Inspector after importing the 6 fresh PNGs:
@@ -1443,6 +1443,7 @@ function bindKeys() {
 function onStart() {
     boxColorWorks = testBoxColor();
     print("AutoBuild: box colour cloning works = " + boxColorWorks);
+    print("AutoBuild: v76 loaded (lens-sync test)");
     loadStats();
     if (buildBoard()) {
         bindKeys();
