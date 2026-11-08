@@ -1,4 +1,5 @@
-// WordGame6_AutoBuild_v79.js - Lens Studio (classic JavaScript)
+// WordGame6_AutoBuild_v80.js - Lens Studio (classic JavaScript)
+// v80 2026-11-08: OCEAN theme (mustafa picked it, Morning Paper looked cheap). Navy #0C2A43, teal #2A9D8F, gold #E9C46A. Banner fix: title/rule/dateline hide on game over, banner moves to Y 0.84 clear of the grid (was 0.58, overlapped row 1 so letters showed through it).
 // v44 2026-11-07: FRESH build (user deleted all textures).
 // Same wide layout as v43. BINDINGS - fill these in the
 // Inspector after importing the 6 fresh PNGs:
@@ -128,25 +129,25 @@
 var ROWS = 5; // v32: 5 guesses, not 6
 var COLS = 6;
 
-var BLUE = new vec4(0.08, 0.50, 0.24, 1.0); // v78: Morning Paper deep green #15803D (was indigo #6366f1)
-var YELLOW = new vec4(0.71, 0.33, 0.04, 1.0); // v78: Morning Paper warm ochre #B45309 (was amber #fbbf24)
+var BLUE = new vec4(0.16, 0.62, 0.56, 1.0); // v80: Ocean teal #2A9D8F correct (was Morning Paper green #15803D)
+var YELLOW = new vec4(0.91, 0.77, 0.42, 1.0); // v80: Ocean soft gold #E9C46A present (was Morning Paper ochre #B45309)
 // v10: GREY was 0.62 — white letters on light grey were faint.
 // Darker now so white letters pop, like the reference.
-var GREY = new vec4(0.84, 0.83, 0.82, 1.0); // v78: Morning Paper warm grey #D6D3D1 (was #9ca3af)
-var KEY_GREY = new vec4(0.98, 0.97, 0.95, 1.0); // v78: Morning Paper cream #FAF7F2 unplayed keys (was white)
-var INDIGO = new vec4(0.11, 0.10, 0.09, 1.0); // v78: Morning Paper ink #1C1917 (was indigo #6366f1)
-var INK = new vec4(0.11, 0.10, 0.09, 1.0); // v78: Morning Paper ink #1C1917
-var CREAM = new vec4(0.98, 0.97, 0.95, 1.0); // v78: Morning Paper cream #FAF7F2
-var RED = new vec4(0.73, 0.11, 0.11, 1.0); // v78: Morning Paper masthead red #B91C1C
-var MUTED = new vec4(0.47, 0.44, 0.42, 1.0); // v78: Morning Paper muted label #78716C
-var ABSENT_LETTER = new vec4(0.66, 0.64, 0.62, 1.0); // v78: Morning Paper absent letter #A8A29E
-var BODY_INK = new vec4(0.27, 0.25, 0.24, 1.0); // v78: Morning Paper body text #44403C
+var GREY = new vec4(0.80, 0.84, 0.88, 1.0); // v80: Ocean grey-blue #CBD5E1 absent (was Morning Paper warm grey #D6D3D1)
+var KEY_GREY = new vec4(1.0, 1.0, 1.0, 1.0); // v80: Ocean white unplayed keys (was Morning Paper cream #FAF7F2)
+var INDIGO = new vec4(0.05, 0.16, 0.26, 1.0); // v80: Ocean navy #0C2A43 (was Morning Paper ink #1C1917)
+var INK = new vec4(0.05, 0.16, 0.26, 1.0); // v80: Ocean navy #0C2A43 (was Morning Paper ink #1C1917)
+var CREAM = new vec4(1.0, 1.0, 1.0, 1.0); // v80: Ocean white (was Morning Paper cream #FAF7F2)
+var RED = new vec4(0.16, 0.62, 0.56, 1.0); // v80: Ocean teal #2A9D8F accent (was Morning Paper red #B91C1C)
+var MUTED = new vec4(0.39, 0.45, 0.55, 1.0); // v80: Ocean slate #64748B muted (was Morning Paper #78716C)
+var ABSENT_LETTER = new vec4(0.39, 0.45, 0.55, 1.0); // v80: Ocean slate #64748B absent letter (was Morning Paper #A8A29E)
+var BODY_INK = new vec4(0.05, 0.16, 0.26, 1.0); // v80: Ocean navy #0C2A43 body text (was Morning Paper #44403C)
 var GLASS_TILE = new vec4(1.0, 1.0, 1.0, 0.55); // v32: glassy translucent white for empty tiles
 var GLASS_PILL = new vec4(1.0, 1.0, 1.0, 0.75); // v32: light glassy pill behind the message
 var DARKTEXT = new vec4(0.18, 0.06, 0.40, 1.0); // v32: dark plum for message text on the light pill
 var DOT_GREY = new vec4(0.61, 0.64, 0.69, 1.0); // v32: empty progress dots
 var WHITE = new vec4(1.0, 1.0, 1.0, 1.0);
-var TILE_GREY = new vec4(0.98, 0.97, 0.95, 1.0); // v78: Morning Paper cream #FAF7F2 unplayed tiles (was white)
+var TILE_GREY = new vec4(1.0, 1.0, 1.0, 1.0); // v80: Ocean white unplayed tiles (was Morning Paper cream #FAF7F2)
 // v11: empty tiles were 0.80-0.85 — almost the same as the light
 // wall, so rows 2-6 looked missing. Only the scored row showed,
 // because it had a coloured background + letters. Empty tiles now
@@ -347,6 +348,8 @@ var introPlayBg = null; // v74: PLAY pill button bg
 var introPlayTextObj = null; // v74: 'PLAY' text
 var introPlayText = null;
 var introRuleObjs = []; // v78: Morning Paper red rule(s) on the intro card
+var titleObj = null; // v80: masthead WORDLY (global so game over can hide it)
+var redRuleObj = null; // v80: masthead teal rule (global so game over can hide it)
 var datelineObj = null; // v79: masthead dateline object
 var datelineText = null; // v79: masthead dateline text
 var introDateObj = null; // v79: dateline on the intro card
@@ -804,6 +807,12 @@ function setIntroVisible(v) {
     for (var di = 0; di < introDateObjs.length; di++) { if (introDateObjs[di]) { introDateObjs[di].enabled = v; } } // v79: intro dateline follows the intro
     updateBoardLetters();
 }
+// v80: show/hide the masthead (title + rule + dateline). Hidden on game over so the banner can take the top of the screen. The Rules/Stats buttons stay visible.
+function setMastheadVisible(v) {
+    if (titleObj) { titleObj.enabled = v; }
+    if (redRuleObj) { redRuleObj.enabled = v; }
+    if (datelineObj) { datelineObj.enabled = v; }
+}
 function setRulesPanelVisible(v) {
     if (rulesPanelBg) { rulesPanelBg.enabled = v; }
     if (rulesPanelObj) { rulesPanelObj.enabled = v; }
@@ -838,7 +847,7 @@ function toggleRules() {
     panelOpen = "rules";
     setStatsPanelVisible(false);
     if (rulesPanelText) {
-        rulesPanelText.text = "Guess the 6-letter word in 5 tries.\n\nGREEN = right letter, right place\nORANGE = right letter, wrong place\nGREY = letter not in the word\n\nENTER submits, BACK deletes.";
+        rulesPanelText.text = "Guess the 6-letter word in 5 tries.\n\nTEAL = right letter, right place\nGOLD = right letter, wrong place\nGREY = letter not in the word\n\nENTER submits, BACK deletes."; // v80: Ocean colour names
     }
     setRulesPanelVisible(true);
 }
@@ -910,7 +919,7 @@ function buildBoard() {
     // Text background, set below). Add the WORDLY title above it
     // and the 5 progress dots below it.
     if (script.templateMsgObj) {
-        var titleObj = copyUnder(script.orthoCamera, script.templateMsgObj, "TitleText");
+        titleObj = copyUnder(script.orthoCamera, script.templateMsgObj, "TitleText"); // v80: global (was local)
         titleObj.enabled = true;
         setPos(titleObj, 0, 0.88); // v79: Daily Edition masthead (was 0.86)
         setAnchorSize(titleObj, 1.9, 0.16); // v53: taller anchor for the even bolder font (was 0.14)
@@ -925,7 +934,7 @@ function buildBoard() {
         }
         // v78: Morning Paper masthead rule - thin red line under the title.
         if (script.templateBoxObj && script.redRuleTexture) {
-            var redRuleObj = copyUnder(script.orthoCamera, script.templateBoxObj, "TitleRedRule");
+            redRuleObj = copyUnder(script.orthoCamera, script.templateBoxObj, "TitleRedRule"); // v80: global (was local)
             redRuleObj.enabled = true;
             setPos(redRuleObj, 0, 0.79);
             setAnchorSize(redRuleObj, 0.90, 0.03); // v79: Daily Edition rule spans the masthead (was 0.60)
@@ -956,7 +965,7 @@ function buildBoard() {
         // v64: big game-over text on the board (Daily style) -
         // white bold with black outline, over the grid centre.
         gameOverTextObj = copyUnder(script.orthoCamera, script.templateMsgObj, "GameOverText");
-        setPos(gameOverTextObj, 0, 0.58); // v79: Daily Edition on the banner (was 0.55)
+        setPos(gameOverTextObj, 0, 0.84); // v80: Ocean - headline on the top banner (was 0.58, overlapped grid row 1)
         // v67: black countdown pill (Daily style) below the Stats
         // panel - 'Next word in HH:MM:SS', white on black.
         if (script.templateBoxObj && script.countdownTexture) {
@@ -978,18 +987,18 @@ function buildBoard() {
         // v79: Daily Edition banner behind the headline (cream card, so green/ink text is legible over any scored grid).
         if (script.templateBoxObj && script.bannerTexture) {
             gameOverBgObj = copyUnder(script.orthoCamera, script.templateBoxObj, "GameOverBanner");
-            setPos(gameOverBgObj, 0, 0.58);
-            setAnchorSize(gameOverBgObj, 1.6, 0.28);
+            setPos(gameOverBgObj, 0, 0.84); // v80: banner at the top, clear of the grid (was 0.58, overlapped row 1)
+            setAnchorSize(gameOverBgObj, 1.4, 0.28); // v80: narrower (renders 1.4 x 0.121, spans 0.780-0.901)
             setIcon(getImageComp(gameOverBgObj), script.bannerTexture);
             gameOverBgObj.enabled = false;
         }
         // v79: Daily Edition score sub-line under the headline.
         if (script.templateMsgObj) {
             gameOverSubObj = copyUnder(script.orthoCamera, script.templateMsgObj, "GameOverSub");
-            setPos(gameOverSubObj, 0, 0.47);
+            setPos(gameOverSubObj, 0, 0.733); // v80: sub-line in the gap between banner bottom (0.780) and grid top (0.6875) (was 0.47)
             setAnchorSize(gameOverSubObj, 1.4, 0.10);
             gameOverSubText = getTextComp(gameOverSubObj);
-            if (gameOverSubText) { setTextSize(gameOverSubText, 20); noBg(gameOverSubText); gameOverSubText.textFill.color = MUTED; try { gameOverSubText.horizontalAlignment = 1; } catch (e) { } gameOverSubText.text = ""; }
+            if (gameOverSubText) { setTextSize(gameOverSubText, 24); noBg(gameOverSubText); gameOverSubText.textFill.color = MUTED; try { gameOverSubText.horizontalAlignment = 1; } catch (e) { } gameOverSubText.text = ""; } // v80: font 24 (was 20)
             gameOverSubObj.enabled = false;
         }
         // v79: Daily Edition share line under the countdown.
@@ -1224,7 +1233,7 @@ function buildBoard() {
         setPos(statsTitleObj, 0, 0.18);
         setAnchorSize(statsTitleObj, 1.2, 0.12);
         var statsTitleText = getTextComp(statsTitleObj);
-        if (statsTitleText) { setTextSize(statsTitleText, 28); noBg(statsTitleText); statsTitleText.textFill.color = INK; try { statsTitleText.horizontalAlignment = 1; } catch (e) { } statsTitleText.text = "YOUR PAPER"; setBold(statsTitleText, INK); } // v79: Daily Edition (was STATS)
+        if (statsTitleText) { setTextSize(statsTitleText, 28); noBg(statsTitleText); statsTitleText.textFill.color = INK; try { statsTitleText.horizontalAlignment = 1; } catch (e) { } statsTitleText.text = "YOUR STATS"; setBold(statsTitleText, INK); } // v80: Ocean (was YOUR PAPER in Morning Paper)
         statsTitleObj.enabled = false;
         // v60: Stats as a row (Daily style) - 5 columns, big
         // number on top, small label below. No multi-line text.
@@ -1383,7 +1392,7 @@ function drawBoard() {
                 // cloning failed, the box stays white and the
                 // LETTER takes the score colour instead.
                 setTileBoxColor(box, bg); // v51: tall tile
-                if (boxColorWorks) { tile.textFill.color = (s[c] === 0) ? ABSENT_LETTER : WHITE; } // v78: Morning Paper - present (ochre) gets white, absent (warm grey) gets muted
+                if (boxColorWorks) { tile.textFill.color = (s[c] === 0) ? ABSENT_LETTER : (s[c] === 1) ? INK : WHITE; } // v80: Ocean - present (light gold) gets navy, absent gets slate, correct gets white
                 else { tile.textFill.color = bg; }
             } else if (r === guesses.length) {
                 setTileBoxColor(box, TILE_GREY); // v51: tall tile (was setBoxColor)
@@ -1420,7 +1429,7 @@ function drawBoard() {
             var kbg = (st === 2) ? BLUE : (st === 1) ? YELLOW : GREY;
             if (boxColorWorks) {
                 setKeyBoxColor(k, kbg);
-                if (kt) { kt.textFill.color = (st === 0) ? ABSENT_LETTER : WHITE; } // v78: Morning Paper - present white, absent muted
+                if (kt) { kt.textFill.color = (st === 0) ? ABSENT_LETTER : (st === 1) ? INK : WHITE; } // v80: Ocean - present (light gold) gets navy
             } else {
                 if (kt) { kt.textFill.color = kbg; }
             }
@@ -1465,6 +1474,7 @@ function restoreToday() {
         if (countdownText) { countdownText.text = "Next word in " + nextWordIn(); }
         panelOpen = "stats"; updateStatsRow(); setStatsPanelVisible(true);
     }
+    setMastheadVisible(!gameOver); // v80: hide the masthead if the restored game is over (banner takes the top)
     setIntroVisible(false); // v75: no intro - the player already started today
     return true;
 }
@@ -1474,6 +1484,7 @@ function newGame() {
     current = "";
     gameOver = false;
     gameWon = false;
+    setMastheadVisible(true); // v80: masthead back for the new game
     setKeyboardVisible(true); // v68: keyboard back for the new game
     if (gameOverTextObj) { gameOverTextObj.enabled = false; }
     if (gameOverBgObj) { gameOverBgObj.enabled = false; }
@@ -1533,7 +1544,8 @@ function finishFlip() {
         gameWon = true;
         recordWin();
         setKeyboardVisible(false); // v68: whole keyboard disappears on game over
-        if (gameOverText) { gameOverText.text = "You won!"; gameOverText.textFill.color = BLUE; } // v78: Morning Paper green win
+        setMastheadVisible(false); // v80: banner takes the top on game over
+        if (gameOverText) { gameOverText.text = "You won!"; gameOverText.textFill.color = BLUE; } // v80: Ocean teal win
         if (gameOverTextObj) { gameOverTextObj.enabled = true; }
         if (gameOverBgObj) { gameOverBgObj.enabled = true; }
         if (gameOverSubObj) { gameOverSubObj.enabled = true; }
@@ -1549,7 +1561,8 @@ function finishFlip() {
         gameWon = false;
         recordLoss();
         setKeyboardVisible(false); // v68: whole keyboard disappears on game over
-        if (gameOverText) { gameOverText.text = "Game over!"; gameOverText.textFill.color = INK; } // v78: Morning Paper ink loss
+        setMastheadVisible(false); // v80: banner takes the top on game over
+        if (gameOverText) { gameOverText.text = "Game over!"; gameOverText.textFill.color = INK; } // v80: Ocean navy loss
         if (gameOverTextObj) { gameOverTextObj.enabled = true; }
         if (gameOverBgObj) { gameOverBgObj.enabled = true; }
         if (gameOverSubObj) { gameOverSubObj.enabled = true; }
@@ -1619,7 +1632,7 @@ function bindKeys() {
 function onStart() {
     boxColorWorks = testBoxColor();
     print("AutoBuild: box colour cloning works = " + boxColorWorks);
-    print("AutoBuild: v79 loaded (Daily Edition)");
+    print("AutoBuild: v80 loaded (Ocean)");
     loadStats();
     if (buildBoard()) {
         var dl = datelineString();
