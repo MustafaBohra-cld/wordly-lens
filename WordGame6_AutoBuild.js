@@ -1,4 +1,4 @@
-// WordGame6_AutoBuild_v78.js - Lens Studio (classic JavaScript)
+// WordGame6_AutoBuild_v79.js - Lens Studio (classic JavaScript)
 // v44 2026-11-07: FRESH build (user deleted all textures).
 // Same wide layout as v43. BINDINGS - fill these in the
 // Inspector after importing the 6 fresh PNGs:
@@ -120,6 +120,8 @@
 // @input Asset.Texture countdownTexture // v73: black countdown pill, Stats-panel width, with clock icon (pill-black-stats.png)
 // @input Asset.Texture buttonTexture // v78: Morning Paper - round ink circle for Rules/Stats buttons (button-ink-round.png)
 // @input Asset.Texture redRuleTexture // v78: Morning Paper - thin red masthead rule under the title (red-rule.png)
+// @input Asset.Texture introPanelTexture // v79: Daily Edition - tall cream intro card (intro-panel-cream-v79.png)
+// @input Asset.Texture bannerTexture // v79: Daily Edition - cream game-over banner (banner-cream-v79.png)
 // @input SceneObject templateMsgObj
 // @input string[] wordList = {"PLANET", "GARDEN", "BRIDGE", "CASTLE", "MARKET", "SILVER", "GOLDEN", "WINTER", "SUMMER", "SPRING", "AUTUMN", "BANANA", "ORANGE", "PURPLE", "JUNGLE", "DESERT", "ISLAND", "BREEZE", "MEADOW", "FOREST", "HARBOR", "LETTER", "NUMBER", "PEOPLE", "FAMILY", "FRIEND", "SCHOOL", "TRAVEL", "DANCER", "SINGER", "PLAYER", "WINNER", "SUNSET", "STARRY", "CLOUDY", "FLOWER", "POCKET", "BUTTON", "WINDOW", "PENCIL", "HAMMER", "LADDER", "ROCKET", "DRAGON", "WIZARD", "KNIGHT", "PIRATE", "SAILOR", "FARMER", "DOCTOR", "LAWYER", "WORKER", "DRIVER", "RUNNER", "JUMPER", "HUNTER", "FISHER", "ARTIST", "WRITER", "READER", "LISTEN"}
 
@@ -300,23 +302,23 @@ var BLACKBG = new vec4(0.12, 0.12, 0.12, 1.0);
 // high = 71px x 88px, tall-narrow — that is why they looked
 // random. Correct square tile: 0.23 wide x 0.10 high = ~92px x 80px.
 // Correct square key: 0.18 wide x 0.09 high = ~64px x 72px.
-var TILE_X = [-0.618, -0.371, -0.124, 0.124, 0.371, 0.618]; // v53: bigger tiles, green gap stays 2px (spacing 0.247, was 0.236); orange gap stays 4px
-var TILE_Y = [0.640, 0.485, 0.330, 0.175, 0.020]; // v54: whole game lifted up 0.10 (was 0.540...) - ENTER was hidden behind the carousel // v32: 5 rows, shifted down for title + pill
+var TILE_X = [-0.6375, -0.3825, -0.1275, 0.1275, 0.3825, 0.6375]; // v79: Daily Edition - real 5px gutters (spacing 0.255, was 0.247)
+var TILE_Y = [0.615, 0.455, 0.295, 0.135, -0.025]; // v79: Daily Edition - real 12px gutters (spacing 0.160, was 0.155)
 
 // QWERTY keyboard: [letter, x, y] — measured from reference.
 // Row1 Y 0.05, row2 Y -0.07, row3 Y -0.20, ENTER Y -0.32.
 // Keyboard bottom (ENTER bottom -0.365) sits just above the
 // capture button top (-0.30), ENTER is on the right so it
 // never overlaps the centre capture circle.
-var KEY_LAYOUT = [ // v54: whole game lifted up 0.10 (X spacing 0.196, Y spacing 0.132)
-    ["Q", -0.882, -0.136], ["W", -0.686, -0.136], ["E", -0.490, -0.136], ["R", -0.294, -0.136], ["T", -0.098, -0.136],
-    ["Y", 0.098, -0.136], ["U", 0.294, -0.136], ["I", 0.490, -0.136], ["O", 0.686, -0.136], ["P", 0.882, -0.136],
-    ["A", -0.784, -0.268], ["S", -0.588, -0.268], ["D", -0.392, -0.268], ["F", -0.196, -0.268], ["G", 0.00, -0.268],
-    ["H", 0.196, -0.268], ["J", 0.392, -0.268], ["K", 0.588, -0.268], ["L", 0.784, -0.268],
-    ["Z", -0.686, -0.400], ["X", -0.490, -0.400], ["C", -0.294, -0.400], ["V", -0.098, -0.400], ["B", 0.098, -0.400],
-    ["N", 0.294, -0.400], ["M", 0.490, -0.400],
-    ["BACK", 0.777, -0.400], // v42: Daily match - DEL at Daily's X
-    ["ENTER", 0.667, -0.520] // v54: lifted up with the game (was -0.620) - was hidden behind the carousel
+var KEY_LAYOUT = [ // v79: Daily Edition - ENTER + BACK move INTO row 3 (3 rows total); bottom edge -0.5065, clear of the carousel band
+    ["Q", -0.882, -0.180], ["W", -0.686, -0.180], ["E", -0.490, -0.180], ["R", -0.294, -0.180], ["T", -0.098, -0.180],
+    ["Y", 0.098, -0.180], ["U", 0.294, -0.180], ["I", 0.490, -0.180], ["O", 0.686, -0.180], ["P", 0.882, -0.180],
+    ["A", -0.784, -0.312], ["S", -0.588, -0.312], ["D", -0.392, -0.312], ["F", -0.196, -0.312], ["G", 0.00, -0.312],
+    ["H", 0.196, -0.312], ["J", 0.392, -0.312], ["K", 0.588, -0.312], ["L", 0.784, -0.312],
+    ["ENTER", -0.826, -0.444], // v79: ENTER in row 3 (was its own 4th row at -0.520)
+    ["Z", -0.558, -0.444], ["X", -0.372, -0.444], ["C", -0.186, -0.444], ["V", 0.00, -0.444], ["B", 0.186, -0.444],
+    ["N", 0.372, -0.444], ["M", 0.558, -0.444],
+    ["BACK", 0.826, -0.444] // v79: BACK in row 3 (was -0.400)
 ];
 
 var tiles = [];   // Component.Text[36] — LETTER layer
@@ -345,6 +347,25 @@ var introPlayBg = null; // v74: PLAY pill button bg
 var introPlayTextObj = null; // v74: 'PLAY' text
 var introPlayText = null;
 var introRuleObjs = []; // v78: Morning Paper red rule(s) on the intro card
+var datelineObj = null; // v79: masthead dateline object
+var datelineText = null; // v79: masthead dateline text
+var introDateObj = null; // v79: dateline on the intro card
+var introDateText = null; // v79: intro dateline text
+var introDateObjs = []; // v79: intro dateline objects (show/hide with the intro)
+var gameOverBgObj = null; // v79: cream banner behind the headline
+var gameOverSubObj = null; // v79: score sub-line object
+var gameOverSubText = null; // v79: score sub-line text
+var shareTextObj = null; // v79: 'Record & share it!' line
+var popKeyIdx = -1; // v79: key pop animation
+var popKeyTimer = 0;
+var popTileIdx = -1; // v79: tile pop on type
+var popTileTimer = 0;
+var waveRow = -1; // v79: win wave
+var waveCol = 0;
+var waveTimer = 0;
+var waveActive = false;
+var shakeRow = -1; // v79: shake on short ENTER
+var shakeTimer = 0;
 var rulesTextComp = null;
 var rulesPanelObj = null;
 var statsPanelObj = null;
@@ -420,6 +441,30 @@ function setBoxColor(img, color) {
 // texture (128x192, 1.5:1) so they render 1.5x taller than
 // wide. Falls back to whiteTexture if tileTexture is empty.
 // Keys, Rules/Stats buttons keep setBoxColor (square).
+function setTilePop(idx, s) {
+    if (s < 0.02) { s = 0.02; }
+    try {
+        var box = tileBox[idx];
+        if (box && box.getSceneObject) {
+            var so = box.getSceneObject();
+            if (so && so.getTransform) { so.getTransform().setLocalScale(new vec3(s, s, 1)); }
+        }
+        var tile = tiles[idx];
+        if (tile && tile.getSceneObject) {
+            var tso = tile.getSceneObject();
+            if (tso && tso.getTransform) { tso.getTransform().setLocalScale(new vec3(s, s, 1)); }
+        }
+    } catch (e) { }
+}
+function setKeyScale(idx, s) {
+    if (s < 0.02) { s = 0.02; }
+    try {
+        var kb = keyBoxes[idx];
+        if (kb && kb.getTransform) { kb.getTransform().setLocalScale(new vec3(s, s, 1)); }
+        var k = keys[idx];
+        if (k && k.getTransform) { k.getTransform().setLocalScale(new vec3(s, s, 1)); }
+    } catch (e) { }
+}
 function setTileBoxColor(img, color) {
     if (!img) { return; }
     var tex = script.tileTexture || script.whiteTexture;
@@ -603,11 +648,12 @@ var HIDDEN = WHITE; // "." in white ink = invisible on a white tile, but alpha 1
 // Fit off. Only ENTER/DEL get a WIDER block (same height) so
 // their longer words fit at a near-normal size instead of
 // shrinking to fit a narrow box.
-var BLOCK_H = 0.150; // v53: tiles a little bigger (109px, was 104px) - tall tiles
-var TILE_W = 0.25; // v42: Daily match (was 0.23)
+var BLOCK_H = 0.145; // v79: Daily Edition tiles 86x113px (was 0.150)
+var TILE_W = 0.24; // v79: Daily Edition (was 0.25)
 var KEY_H = 0.125; // v53: keys a little taller (90px, was 83px) // key height (0.19 wide = ~68px, 0.125 high = ~90px)
 var KEY_W = 0.19; // v43: WIDER keys (was 0.178)
-var BLOCK_FONT = 30; // v45: SMALLER letters + bold (DECREASED per user, was 36)
+var BLOCK_FONT = 32; // v79: Daily Edition tile letters bigger (was 30)
+var KEY_FONT = 30; // v79: Daily Edition key letters stay 30
 function styleBlock(comp, size) {
     if (!comp) { return; }
     setTextSize(comp, size);
@@ -755,6 +801,7 @@ function setIntroVisible(v) {
     if (introPlayBg) { introPlayBg.enabled = v; }
     if (introPlayTextObj) { introPlayTextObj.enabled = v; }
     for (var ri = 0; ri < introRuleObjs.length; ri++) { if (introRuleObjs[ri]) { introRuleObjs[ri].enabled = v; } } // v78: red rule follows the intro
+    for (var di = 0; di < introDateObjs.length; di++) { if (introDateObjs[di]) { introDateObjs[di].enabled = v; } } // v79: intro dateline follows the intro
     updateBoardLetters();
 }
 function setRulesPanelVisible(v) {
@@ -865,7 +912,7 @@ function buildBoard() {
     if (script.templateMsgObj) {
         var titleObj = copyUnder(script.orthoCamera, script.templateMsgObj, "TitleText");
         titleObj.enabled = true;
-        setPos(titleObj, 0, 0.86); // v54: whole game lifted up (was 0.76) - ENTER was hidden behind the carousel
+        setPos(titleObj, 0, 0.88); // v79: Daily Edition masthead (was 0.86)
         setAnchorSize(titleObj, 1.9, 0.16); // v53: taller anchor for the even bolder font (was 0.14)
         var titleText = getTextComp(titleObj);
         if (titleText) {
@@ -880,9 +927,24 @@ function buildBoard() {
         if (script.templateBoxObj && script.redRuleTexture) {
             var redRuleObj = copyUnder(script.orthoCamera, script.templateBoxObj, "TitleRedRule");
             redRuleObj.enabled = true;
-            setPos(redRuleObj, 0, 0.77);
-            setAnchorSize(redRuleObj, 0.60, 0.03);
+            setPos(redRuleObj, 0, 0.79);
+            setAnchorSize(redRuleObj, 0.90, 0.03); // v79: Daily Edition rule spans the masthead (was 0.60)
             setIcon(getImageComp(redRuleObj), script.redRuleTexture);
+        }
+    }
+    // v79: Daily Edition DATELINE - 'SUNDAY, NOVEMBER 8', from the daily-word date. The daily-ritual hook.
+    if (script.templateMsgObj) {
+        datelineObj = copyUnder(script.orthoCamera, script.templateMsgObj, "DatelineText");
+        datelineObj.enabled = true;
+        setPos(datelineObj, 0, 0.735);
+        setAnchorSize(datelineObj, 1.4, 0.07);
+        datelineText = getTextComp(datelineObj);
+        if (datelineText) {
+            setTextSize(datelineText, 16);
+            noBg(datelineText);
+            datelineText.textFill.color = MUTED;
+            try { datelineText.horizontalAlignment = 1; } catch (e) { }
+            datelineText.text = "";
         }
     }
     // v53: progress dots REMOVED (mustafa) - no dots are created.
@@ -894,7 +956,7 @@ function buildBoard() {
         // v64: big game-over text on the board (Daily style) -
         // white bold with black outline, over the grid centre.
         gameOverTextObj = copyUnder(script.orthoCamera, script.templateMsgObj, "GameOverText");
-        setPos(gameOverTextObj, 0, 0.55);
+        setPos(gameOverTextObj, 0, 0.58); // v79: Daily Edition on the banner (was 0.55)
         // v67: black countdown pill (Daily style) below the Stats
         // panel - 'Next word in HH:MM:SS', white on black.
         if (script.templateBoxObj && script.countdownTexture) {
@@ -912,7 +974,33 @@ function buildBoard() {
         countdownTextObj.enabled = false;
         setAnchorSize(gameOverTextObj, 1.8, 0.25);
         gameOverText = getTextComp(gameOverTextObj);
-        if (gameOverText) { setTextSize(gameOverText, 44); styleBlock(gameOverText, 44); noBg(gameOverText); gameOverText.textFill.color = INK; try { gameOverText.horizontalAlignment = 1; } catch (e) { } gameOverText.text = ""; } // v78: Morning Paper ink default; win sets green in finishFlip
+        if (gameOverText) { setTextSize(gameOverText, 52); styleBlock(gameOverText, 52); noBg(gameOverText); gameOverText.textFill.color = INK; try { gameOverText.horizontalAlignment = 1; } catch (e) { } gameOverText.text = ""; } // v79: Daily Edition headline 52 (was 44)
+        // v79: Daily Edition banner behind the headline (cream card, so green/ink text is legible over any scored grid).
+        if (script.templateBoxObj && script.bannerTexture) {
+            gameOverBgObj = copyUnder(script.orthoCamera, script.templateBoxObj, "GameOverBanner");
+            setPos(gameOverBgObj, 0, 0.58);
+            setAnchorSize(gameOverBgObj, 1.6, 0.28);
+            setIcon(getImageComp(gameOverBgObj), script.bannerTexture);
+            gameOverBgObj.enabled = false;
+        }
+        // v79: Daily Edition score sub-line under the headline.
+        if (script.templateMsgObj) {
+            gameOverSubObj = copyUnder(script.orthoCamera, script.templateMsgObj, "GameOverSub");
+            setPos(gameOverSubObj, 0, 0.47);
+            setAnchorSize(gameOverSubObj, 1.4, 0.10);
+            gameOverSubText = getTextComp(gameOverSubObj);
+            if (gameOverSubText) { setTextSize(gameOverSubText, 20); noBg(gameOverSubText); gameOverSubText.textFill.color = MUTED; try { gameOverSubText.horizontalAlignment = 1; } catch (e) { } gameOverSubText.text = ""; }
+            gameOverSubObj.enabled = false;
+        }
+        // v79: Daily Edition share line under the countdown.
+        if (script.templateMsgObj) {
+            shareTextObj = copyUnder(script.orthoCamera, script.templateMsgObj, "ShareText");
+            setPos(shareTextObj, 0, -0.42);
+            setAnchorSize(shareTextObj, 1.4, 0.08);
+            var shareText = getTextComp(shareTextObj);
+            if (shareText) { setTextSize(shareText, 16); setBold(shareText, RED); noBg(shareText); shareText.textFill.color = RED; try { shareText.horizontalAlignment = 1; } catch (e) { } shareText.text = "Record & share it!"; }
+            shareTextObj.enabled = false;
+        }
         gameOverTextObj.enabled = false;
         var rulesObj = copyUnder(script.orthoCamera, script.templateMsgObj, "RulesText");
         rulesObj.enabled = true;
@@ -942,7 +1030,7 @@ function buildBoard() {
         // ends at the same right edge (0.72) as the other keys.
         // v11 measured: single key 0.18 wide, BACK 0.24 wide,
         // ENTER 0.38 wide (about 2 keys), all height 0.09.
-        var keyW = (letter === "ENTER") ? 0.70 : (letter === "BACK") ? 0.35 : KEY_W; // v53: ENTER pill BIGGER (was 0.62), DEL 126px
+        var keyW = (letter === "ENTER") ? 0.34 : (letter === "BACK") ? 0.34 : (KEY_LAYOUT[i][2] < -0.4) ? 0.18 : KEY_W; // v79: Daily Edition - ENTER/BACK 0.34 in row 3, row-3 letters 0.18, rows 1-2 0.19 (was ENTER 0.70, BACK 0.35)
         var keyX = KEY_LAYOUT[i][1];
         setPos(keyObj, keyX, KEY_LAYOUT[i][2]);
         setAnchorSize(keyObj, keyW, KEY_H);
@@ -1005,7 +1093,7 @@ function buildBoard() {
                 else { setBg(kc, INDIGO); } // fallback: Text pill
                 kc.textFill.color = CREAM;
             } else {
-                styleBlock(kc, (letter === "BACK") ? 24 : BLOCK_FONT);
+                styleBlock(kc, (letter === "BACK") ? 24 : KEY_FONT); // v79: keys use KEY_FONT 30 (tiles use BLOCK_FONT 32)
                 if (letter !== "BACK") { setBold(kc, INK); } // v78: Morning Paper ink letters on cream keys
                 noBg(kc);
                 kc.textFill.color = INK;
@@ -1026,18 +1114,18 @@ function buildBoard() {
     // NOT top-right. Black box, white text, so they pop.
     var rulesBtn = copyUnder(script.orthoCamera, script.templateKeyObj, "RulesButton");
     rulesBtn.enabled = true;
-    setPos(rulesBtn, 0.89, 0.42); // v54: lifted up with the game (was 0.32)
-    setAnchorSize(rulesBtn, 0.16, 0.10);
+    setPos(rulesBtn, -0.85, 0.88); // v79: Daily Edition - flanks the title on the masthead line (was 0.89, 0.42)
+    setAnchorSize(rulesBtn, 0.18, 0.12); // v79: bigger tap target (was 0.16 x 0.10)
     if (script.templateBoxObj) {
         var rbBoxObj = copyUnder(script.orthoCamera, script.templateBoxObj, "RulesBox");
-        rbBoxObj.enabled = true; setPos(rbBoxObj, 0.89, 0.40); setAnchorSize(rbBoxObj, 0.16, 0.10); // v54: lifted up (was 0.30)
+        rbBoxObj.enabled = true; setPos(rbBoxObj, -0.85, 0.88); setAnchorSize(rbBoxObj, 0.18, 0.12); // v79: masthead line (was 0.89, 0.40)
         if (script.buttonTexture) { setIcon(getImageComp(rbBoxObj), script.buttonTexture); } // v78: Morning Paper round ink button
         else { setBoxColor(getImageComp(rbBoxObj), INK); } // fallback: ink square
         // v33: SVG/PNG icon on top, if rulesIconTexture is filled
         // (import rules-icon.png). Falls back to "?" below if not.
         if (script.rulesIconTexture) {
             var rbIconObj = copyUnder(script.orthoCamera, script.templateBoxObj, "RulesIcon");
-            rbIconObj.enabled = true; setPos(rbIconObj, 0.89, 0.40); setAnchorSize(rbIconObj, 0.16 * 0.65, 0.10 * 0.65); // v54: lifted up (was 0.30); v46: small '?' icon centred in the button, like Daily (was full 0.16 x 0.10)
+            rbIconObj.enabled = true; setPos(rbIconObj, -0.85, 0.88); setAnchorSize(rbIconObj, 0.18 * 0.65, 0.12 * 0.65); // v79: masthead line
             setIcon(getImageComp(rbIconObj), script.rulesIconTexture);
         }
     }
@@ -1046,18 +1134,18 @@ function buildBoard() {
     bindButton((typeof rbBoxObj !== "undefined" && rbBoxObj) ? rbBoxObj : rulesBtn, toggleRules);
     var statsBtn = copyUnder(script.orthoCamera, script.templateKeyObj, "StatsButton");
     statsBtn.enabled = true;
-    setPos(statsBtn, 0.89, 0.29); // v54: lifted up with the game (was 0.19)
-    setAnchorSize(statsBtn, 0.16, 0.10);
+    setPos(statsBtn, 0.85, 0.88); // v79: Daily Edition - flanks the title (was 0.89, 0.29)
+    setAnchorSize(statsBtn, 0.18, 0.12); // v79: bigger tap target (was 0.16 x 0.10)
     if (script.templateBoxObj) {
         var sbBoxObj = copyUnder(script.orthoCamera, script.templateBoxObj, "StatsBox");
-        sbBoxObj.enabled = true; setPos(sbBoxObj, 0.89, 0.28); setAnchorSize(sbBoxObj, 0.16, 0.10); // v54: lifted up (was 0.18)
+        sbBoxObj.enabled = true; setPos(sbBoxObj, 0.85, 0.88); setAnchorSize(sbBoxObj, 0.18, 0.12); // v79: masthead line (was 0.89, 0.28)
         if (script.buttonTexture) { setIcon(getImageComp(sbBoxObj), script.buttonTexture); } // v78: Morning Paper round ink button
         else { setBoxColor(getImageComp(sbBoxObj), INK); } // fallback: ink square
         // v33: SVG/PNG icon on top, if statsIconTexture is filled
         // (import stats-icon.png). Falls back to "S" below if not.
         if (script.statsIconTexture) {
             var sbIconObj = copyUnder(script.orthoCamera, script.templateBoxObj, "StatsIcon");
-            sbIconObj.enabled = true; setPos(sbIconObj, 0.89, 0.28); setAnchorSize(sbIconObj, 0.16 * 0.65, 0.10 * 0.65); // v54: lifted up (was 0.18); v46: small bars icon centred in the button, like Daily (was full 0.16 x 0.10)
+            sbIconObj.enabled = true; setPos(sbIconObj, 0.85, 0.88); setAnchorSize(sbIconObj, 0.18 * 0.65, 0.12 * 0.65); // v79: masthead line
             setIcon(getImageComp(sbIconObj), script.statsIconTexture);
         }
     }
@@ -1083,6 +1171,15 @@ function buildBoard() {
         var rulesTitleText = getTextComp(rulesTitleObj);
         if (rulesTitleText) { setTextSize(rulesTitleText, 28); noBg(rulesTitleText); rulesTitleText.textFill.color = INK; try { rulesTitleText.horizontalAlignment = 1; } catch (e) { } rulesTitleText.text = "HOW TO PLAY"; setBold(rulesTitleText, INK); }
         rulesTitleObj.enabled = false;
+        // v79: Daily Edition red rule under the Rules title.
+        if (script.templateBoxObj && script.redRuleTexture) {
+            var rulesRuleObj = copyUnder(script.orthoCamera, script.templateBoxObj, "RulesRedRule");
+            setPos(rulesRuleObj, 0, 0.235);
+            setAnchorSize(rulesRuleObj, 0.50, 0.02);
+            setIcon(getImageComp(rulesRuleObj), script.redRuleTexture);
+            rulesRuleObj.enabled = false;
+            ruleSwatches.push(rulesRuleObj);
+        }
         // Swatches: blue W, yellow Y, grey F in a row.
         var swatchCols = [BLUE, YELLOW, GREY];
         var swatchLetters = ["W", "Y", "F"];
@@ -1127,7 +1224,7 @@ function buildBoard() {
         setPos(statsTitleObj, 0, 0.18);
         setAnchorSize(statsTitleObj, 1.2, 0.12);
         var statsTitleText = getTextComp(statsTitleObj);
-        if (statsTitleText) { setTextSize(statsTitleText, 28); noBg(statsTitleText); statsTitleText.textFill.color = INK; try { statsTitleText.horizontalAlignment = 1; } catch (e) { } statsTitleText.text = "STATS"; setBold(statsTitleText, INK); }
+        if (statsTitleText) { setTextSize(statsTitleText, 28); noBg(statsTitleText); statsTitleText.textFill.color = INK; try { statsTitleText.horizontalAlignment = 1; } catch (e) { } statsTitleText.text = "YOUR PAPER"; setBold(statsTitleText, INK); } // v79: Daily Edition (was STATS)
         statsTitleObj.enabled = false;
         // v60: Stats as a row (Daily style) - 5 columns, big
         // number on top, small label below. No multi-line text.
@@ -1162,43 +1259,53 @@ function buildBoard() {
     // Black card + WORDLY + how to play + PLAY button. Created
     // last so it sits on top. Tap PLAY (or the card) to dismiss.
     if (script.templateMsgObj) {
-        if (script.templateBoxObj && script.panelTexture) {
+        if (script.templateBoxObj && (script.introPanelTexture || script.panelTexture)) {
             introPanelBg = copyUnder(script.orthoCamera, script.templateBoxObj, "IntroPanelBg");
             setPos(introPanelBg, 0, 0.10);
             setAnchorSize(introPanelBg, 1.35, 0.90);
-            setIcon(getImageComp(introPanelBg), script.panelTexture);
+            setIcon(getImageComp(introPanelBg), script.introPanelTexture || script.panelTexture); // v79: own tall card (falls back to panelTexture)
             introPanelBg.enabled = false;
         }
         introTitleObj = copyUnder(script.orthoCamera, script.templateMsgObj, "IntroTitle");
-        setPos(introTitleObj, 0, 0.38);
+        setPos(introTitleObj, 0, 0.40); // v79: Daily Edition front page (was 0.38)
         setAnchorSize(introTitleObj, 1.2, 0.12);
         introTitleText = getTextComp(introTitleObj);
-        if (introTitleText) { setTextSize(introTitleText, 40); setBold(introTitleText, INK); noBg(introTitleText); introTitleText.textFill.color = INK; try { introTitleText.horizontalAlignment = 1; } catch (e) { } introTitleText.text = "WORDLY"; }
+        if (introTitleText) { setTextSize(introTitleText, 44); setBold(introTitleText, INK); noBg(introTitleText); introTitleText.textFill.color = INK; try { introTitleText.horizontalAlignment = 1; } catch (e) { } introTitleText.text = "WORDLY"; }
         // v78: Morning Paper masthead rule under the intro title too.
         if (script.templateBoxObj && script.redRuleTexture) {
             var introRuleObj = copyUnder(script.orthoCamera, script.templateBoxObj, "IntroRedRule");
-            setPos(introRuleObj, 0, 0.30);
-            setAnchorSize(introRuleObj, 0.50, 0.03);
+            setPos(introRuleObj, 0, 0.315);
+            setAnchorSize(introRuleObj, 0.60, 0.03); // v79: Daily Edition (was 0.30 / 0.50)
             setIcon(getImageComp(introRuleObj), script.redRuleTexture);
             introRuleObj.enabled = false;
             introRuleObjs.push(introRuleObj);
         }
         introTitleObj.enabled = false;
+        // v79: Daily Edition dateline on the intro front page (same text as the masthead dateline).
+        if (script.templateMsgObj) {
+            introDateObj = copyUnder(script.orthoCamera, script.templateMsgObj, "IntroDateline");
+            setPos(introDateObj, 0, 0.26);
+            setAnchorSize(introDateObj, 1.2, 0.07);
+            introDateText = getTextComp(introDateObj);
+            if (introDateText) { setTextSize(introDateText, 14); noBg(introDateText); introDateText.textFill.color = MUTED; try { introDateText.horizontalAlignment = 1; } catch (e) { } introDateText.text = ""; }
+            introDateObj.enabled = false;
+            introDateObjs.push(introDateObj);
+        }
         introBodyObj = copyUnder(script.orthoCamera, script.templateMsgObj, "IntroBody");
-        setPos(introBodyObj, 0, 0.08);
-        setAnchorSize(introBodyObj, 1.15, 0.30);
+        setPos(introBodyObj, 0, 0.05); // v79: Daily Edition (was 0.08)
+        setAnchorSize(introBodyObj, 1.15, 0.26); // v79: (was 0.30)
         introBodyText = getTextComp(introBodyObj);
-        if (introBodyText) { setTextSize(introBodyText, 19); noBg(introBodyText); introBodyText.textFill.color = BODY_INK; try { introBodyText.horizontalAlignment = 1; } catch (e) { } introBodyText.text = "Guess the 6-letter word in 5 tries!\n\nNew word every 24 hours!"; }
+        if (introBodyText) { setTextSize(introBodyText, 19); noBg(introBodyText); introBodyText.textFill.color = BODY_INK; try { introBodyText.horizontalAlignment = 1; } catch (e) { } introBodyText.text = "Guess the 6-letter word in 5 tries!\n\nNew word every 24 hours.\nCome back tomorrow for the next one!"; } // v79: Daily Edition
         introBodyObj.enabled = false;
         if (script.templateBoxObj && script.enterPillTexture) {
             introPlayBg = copyUnder(script.orthoCamera, script.templateBoxObj, "IntroPlayBg");
-            setPos(introPlayBg, 0, -0.18);
-            setAnchorSize(introPlayBg, 0.55, 0.18);
+            setPos(introPlayBg, 0, -0.20); // v79: Daily Edition (was -0.18)
+            setAnchorSize(introPlayBg, 0.60, 0.18); // v79: (was 0.55)
             setIcon(getImageComp(introPlayBg), script.enterPillTexture);
             introPlayBg.enabled = false;
         }
         introPlayTextObj = copyUnder(script.orthoCamera, script.templateMsgObj, "IntroPlayText");
-        setPos(introPlayTextObj, 0, -0.18);
+        setPos(introPlayTextObj, 0, -0.20); // v79: Daily Edition (was -0.18)
         setAnchorSize(introPlayTextObj, 0.55, 0.14);
         introPlayText = getTextComp(introPlayTextObj);
         if (introPlayText) { setTextSize(introPlayText, 22); setBold(introPlayText, CREAM); noBg(introPlayText); introPlayText.textFill.color = CREAM; try { introPlayText.horizontalAlignment = 1; } catch (e) { } introPlayText.text = "PLAY"; }
@@ -1332,6 +1439,9 @@ function restoreToday() {
     target = pickWord(); // same daily word
     setKeyboardVisible(!gameOver);
     if (gameOverTextObj) { gameOverTextObj.enabled = false; }
+    if (gameOverBgObj) { gameOverBgObj.enabled = false; }
+    if (gameOverSubObj) { gameOverSubObj.enabled = false; }
+    if (shareTextObj) { shareTextObj.enabled = false; }
     if (countdownBgObj) { countdownBgObj.enabled = false; }
     if (countdownTextObj) { countdownTextObj.enabled = false; }
     closePanels();
@@ -1343,6 +1453,13 @@ function restoreToday() {
         // but do NOT call recordWin/recordLoss again.
         if (gameOverText) { gameOverText.text = gameWon ? "You won!" : "Game over!"; gameOverText.textFill.color = gameWon ? BLUE : INK; } // v78: Morning Paper green win / ink loss
         if (gameOverTextObj) { gameOverTextObj.enabled = true; }
+        if (gameOverBgObj) { gameOverBgObj.enabled = true; }
+        if (gameOverSubObj) { gameOverSubObj.enabled = true; }
+        if (gameOverSubText) {
+            if (gameWon) { gameOverSubText.text = (guesses.length === 1) ? "Solved in 1 try" : "Solved in " + guesses.length + " of 5 tries"; gameOverSubText.textFill.color = MUTED; }
+            else { gameOverSubText.text = "The word was " + target; gameOverSubText.textFill.color = RED; }
+        }
+        if (shareTextObj) { shareTextObj.enabled = true; }
         if (countdownBgObj) { countdownBgObj.enabled = true; }
         if (countdownTextObj) { countdownTextObj.enabled = true; }
         if (countdownText) { countdownText.text = "Next word in " + nextWordIn(); }
@@ -1359,6 +1476,9 @@ function newGame() {
     gameWon = false;
     setKeyboardVisible(true); // v68: keyboard back for the new game
     if (gameOverTextObj) { gameOverTextObj.enabled = false; }
+    if (gameOverBgObj) { gameOverBgObj.enabled = false; }
+    if (gameOverSubObj) { gameOverSubObj.enabled = false; }
+    if (shareTextObj) { shareTextObj.enabled = false; }
     if (countdownBgObj) { countdownBgObj.enabled = false; }
     if (countdownTextObj) { countdownTextObj.enabled = false; }
     closePanels();
@@ -1367,9 +1487,22 @@ function newGame() {
     drawBoard();
     setMessage(""); // v35: removed the "Guess the 6-letter word!" line
 }
+function datelineString() {
+    var days = ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"];
+    var months = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
+    try {
+        var now = new Date();
+        return days[now.getDay()] + ", " + months[now.getMonth()] + " " + now.getDate();
+    } catch (e) {
+        return "";
+    }
+}
 function submitGuess() {
     if (gameOver) { return; } // v67: daily word - no new game until tomorrow (countdown pill already shows)
-    if (current.length !== 6) { return; } // v67: message pill removed - no 'Type 6 letters' line
+    if (current.length !== 6) {
+        if (!gameOver && flipRow < 0) { shakeRow = guesses.length; shakeTimer = 0.30; }
+        return;
+    }
     if (flipRow >= 0) { return; } // v56: a flip is already playing - ignore
     guesses.push(current);
     var g = current;
@@ -1402,6 +1535,11 @@ function finishFlip() {
         setKeyboardVisible(false); // v68: whole keyboard disappears on game over
         if (gameOverText) { gameOverText.text = "You won!"; gameOverText.textFill.color = BLUE; } // v78: Morning Paper green win
         if (gameOverTextObj) { gameOverTextObj.enabled = true; }
+        if (gameOverBgObj) { gameOverBgObj.enabled = true; }
+        if (gameOverSubObj) { gameOverSubObj.enabled = true; }
+        if (gameOverSubText) { gameOverSubText.text = (guesses.length === 1) ? "Solved in 1 try" : "Solved in " + guesses.length + " of 5 tries"; gameOverSubText.textFill.color = MUTED; }
+        if (shareTextObj) { shareTextObj.enabled = true; }
+        waveRow = guesses.length - 1; waveCol = 0; waveTimer = 0; waveActive = true;
         if (countdownBgObj) { countdownBgObj.enabled = true; }
         if (countdownTextObj) { countdownTextObj.enabled = true; }
         if (countdownText) { countdownText.text = "Next word in " + nextWordIn(); }
@@ -1413,6 +1551,10 @@ function finishFlip() {
         setKeyboardVisible(false); // v68: whole keyboard disappears on game over
         if (gameOverText) { gameOverText.text = "Game over!"; gameOverText.textFill.color = INK; } // v78: Morning Paper ink loss
         if (gameOverTextObj) { gameOverTextObj.enabled = true; }
+        if (gameOverBgObj) { gameOverBgObj.enabled = true; }
+        if (gameOverSubObj) { gameOverSubObj.enabled = true; }
+        if (gameOverSubText) { gameOverSubText.text = "The word was " + target; gameOverSubText.textFill.color = RED; }
+        if (shareTextObj) { shareTextObj.enabled = true; }
         if (countdownBgObj) { countdownBgObj.enabled = true; }
         if (countdownTextObj) { countdownTextObj.enabled = true; }
         if (countdownText) { countdownText.text = "Next word in " + nextWordIn(); }
@@ -1426,6 +1568,9 @@ function onKey(letter) {
     if (introOpen) { return; } // v74: intro popup is open - tap PLAY first
     if (panelOpen !== "") { return; } // v66: a panel is open - close it first (X or its button). No ENTER restart: daily word.
     if (flipRow >= 0) { return; } // v56: a flip is playing - ignore input until it finishes
+    var ki = -1;
+    for (var k = 0; k < KEY_LAYOUT.length; k++) { if (KEY_LAYOUT[k][0] === letter) { ki = k; break; } }
+    if (ki >= 0) { popKeyIdx = ki; popKeyTimer = 0.08; setKeyScale(ki, 0.92); }
     if (letter === "ENTER") { submitGuess(); }
     else if (letter === "BACK") {
         if (!gameOver && current.length > 0) {
@@ -1435,6 +1580,8 @@ function onKey(letter) {
     } else if (letter.length === 1 && !gameOver && current.length < 6) {
         current += letter;
         drawBoard();
+        var ti = guesses.length * COLS + (current.length - 1);
+        if (ti >= 0 && ti < ROWS * COLS) { popTileIdx = ti; popTileTimer = 0.10; setTilePop(ti, 1.08); }
     }
 }
 function bindKeys() {
@@ -1472,9 +1619,12 @@ function bindKeys() {
 function onStart() {
     boxColorWorks = testBoxColor();
     print("AutoBuild: box colour cloning works = " + boxColorWorks);
-    print("AutoBuild: v78 loaded (Morning Paper)");
+    print("AutoBuild: v79 loaded (Daily Edition)");
     loadStats();
     if (buildBoard()) {
+        var dl = datelineString();
+        if (datelineText) { datelineText.text = dl; }
+        if (introDateText) { introDateText.text = dl; }
         bindKeys();
         // v75: if today's game was already played (or is in
         // progress), restore it instead of starting fresh.
@@ -1486,6 +1636,51 @@ script.createEvent("UpdateEvent").bind(function (eventData) {
     // v67: live countdown in the black pill while the game is over.
     if (gameOver && countdownText) {
         countdownText.text = "Next word in " + nextWordIn();
+    }
+    var dt2 = 0.016;
+    try { dt2 = eventData.getDeltaTime(); } catch (e2) { }
+    if (!(dt2 > 0) || dt2 > 0.1) { dt2 = 0.016; }
+    if (popKeyTimer > 0) {
+        popKeyTimer -= dt2;
+        if (popKeyTimer <= 0 && popKeyIdx >= 0) { setKeyScale(popKeyIdx, 1); popKeyIdx = -1; }
+    }
+    if (popTileTimer > 0) {
+        popTileTimer -= dt2;
+        if (popTileTimer <= 0 && popTileIdx >= 0) { setTilePop(popTileIdx, 1); popTileIdx = -1; }
+    }
+    if (waveActive && waveRow >= 0) {
+        waveTimer += dt2;
+        var wcol = Math.floor(waveTimer / 0.08);
+        if (wcol > waveCol && wcol < COLS) {
+            waveCol = wcol;
+            setTilePop(waveRow * COLS + wcol, 1.15);
+        }
+        if (waveTimer > 0.08 * COLS + 0.15) {
+            for (var wc = 0; wc < COLS; wc++) { setTilePop(waveRow * COLS + wc, 1); }
+            waveActive = false; waveRow = -1; waveCol = 0; waveTimer = 0;
+        }
+    }
+    if (shakeTimer > 0 && shakeRow >= 0) {
+        shakeTimer -= dt2;
+        var ph = (0.30 - shakeTimer) / 0.30 * Math.PI * 6;
+        var off = Math.sin(ph) * 0.02 * (shakeTimer / 0.30);
+        for (var sc = 0; sc < COLS; sc++) {
+            var sidx = shakeRow * COLS + sc;
+            var sbox = tileBox[sidx];
+            var stile = tiles[sidx];
+            if (sbox && sbox.getSceneObject) { try { setPos(sbox.getSceneObject(), TILE_X[sc] + off, TILE_Y[shakeRow]); } catch (e3) { } }
+            if (stile && stile.getSceneObject) { try { setPos(stile.getSceneObject(), TILE_X[sc] + off, TILE_Y[shakeRow]); } catch (e4) { } }
+        }
+        if (shakeTimer <= 0) {
+            for (var sc2 = 0; sc2 < COLS; sc2++) {
+                var sidx2 = shakeRow * COLS + sc2;
+                var sbox2 = tileBox[sidx2];
+                var stile2 = tiles[sidx2];
+                if (sbox2 && sbox2.getSceneObject) { try { setPos(sbox2.getSceneObject(), TILE_X[sc2], TILE_Y[shakeRow]); } catch (e5) { } }
+                if (stile2 && stile2.getSceneObject) { try { setPos(stile2.getSceneObject(), TILE_X[sc2], TILE_Y[shakeRow]); } catch (e6) { } }
+            }
+            shakeRow = -1;
+        }
     }
     if (flipRow < 0 || !flipScores) { return; }
     var dt = 0.016;
