@@ -1,4 +1,5 @@
-// WordGame6_AutoBuild_v80.js - Lens Studio (classic JavaScript)
+// WordGame6_AutoBuild_v81.js - Lens Studio (classic JavaScript)
+// v81 2026-11-08: Rules/Stats buttons back to their pre-v79 positions (right side, stacked) — mustafa's call. Nothing else changes from v80.
 // v80 2026-11-08: OCEAN theme (mustafa picked it, Morning Paper looked cheap). Navy #0C2A43, teal #2A9D8F, gold #E9C46A. Banner fix: title/rule/dateline hide on game over, banner moves to Y 0.84 clear of the grid (was 0.58, overlapped row 1 so letters showed through it).
 // v44 2026-11-07: FRESH build (user deleted all textures).
 // Same wide layout as v43. BINDINGS - fill these in the
@@ -1123,18 +1124,18 @@ function buildBoard() {
     // NOT top-right. Black box, white text, so they pop.
     var rulesBtn = copyUnder(script.orthoCamera, script.templateKeyObj, "RulesButton");
     rulesBtn.enabled = true;
-    setPos(rulesBtn, -0.85, 0.88); // v79: Daily Edition - flanks the title on the masthead line (was 0.89, 0.42)
-    setAnchorSize(rulesBtn, 0.18, 0.12); // v79: bigger tap target (was 0.16 x 0.10)
+    setPos(rulesBtn, 0.89, 0.42); // v81: back to the right side, beside the board (was -0.85, 0.88 flanking the title)
+    setAnchorSize(rulesBtn, 0.16, 0.10); // v81: previous size (was 0.18 x 0.12)
     if (script.templateBoxObj) {
         var rbBoxObj = copyUnder(script.orthoCamera, script.templateBoxObj, "RulesBox");
-        rbBoxObj.enabled = true; setPos(rbBoxObj, -0.85, 0.88); setAnchorSize(rbBoxObj, 0.18, 0.12); // v79: masthead line (was 0.89, 0.40)
+        rbBoxObj.enabled = true; setPos(rbBoxObj, 0.89, 0.40); setAnchorSize(rbBoxObj, 0.16, 0.10); // v81: back to the right side (was -0.85, 0.88)
         if (script.buttonTexture) { setIcon(getImageComp(rbBoxObj), script.buttonTexture); } // v78: Morning Paper round ink button
         else { setBoxColor(getImageComp(rbBoxObj), INK); } // fallback: ink square
         // v33: SVG/PNG icon on top, if rulesIconTexture is filled
         // (import rules-icon.png). Falls back to "?" below if not.
         if (script.rulesIconTexture) {
             var rbIconObj = copyUnder(script.orthoCamera, script.templateBoxObj, "RulesIcon");
-            rbIconObj.enabled = true; setPos(rbIconObj, -0.85, 0.88); setAnchorSize(rbIconObj, 0.18 * 0.65, 0.12 * 0.65); // v79: masthead line
+            rbIconObj.enabled = true; setPos(rbIconObj, 0.89, 0.40); setAnchorSize(rbIconObj, 0.16 * 0.65, 0.10 * 0.65); // v81: back to the right side
             setIcon(getImageComp(rbIconObj), script.rulesIconTexture);
         }
     }
@@ -1143,18 +1144,18 @@ function buildBoard() {
     bindButton((typeof rbBoxObj !== "undefined" && rbBoxObj) ? rbBoxObj : rulesBtn, toggleRules);
     var statsBtn = copyUnder(script.orthoCamera, script.templateKeyObj, "StatsButton");
     statsBtn.enabled = true;
-    setPos(statsBtn, 0.85, 0.88); // v79: Daily Edition - flanks the title (was 0.89, 0.29)
-    setAnchorSize(statsBtn, 0.18, 0.12); // v79: bigger tap target (was 0.16 x 0.10)
+    setPos(statsBtn, 0.89, 0.29); // v81: back to the right side, beside the board (was 0.85, 0.88 flanking the title)
+    setAnchorSize(statsBtn, 0.16, 0.10); // v81: previous size (was 0.18 x 0.12)
     if (script.templateBoxObj) {
         var sbBoxObj = copyUnder(script.orthoCamera, script.templateBoxObj, "StatsBox");
-        sbBoxObj.enabled = true; setPos(sbBoxObj, 0.85, 0.88); setAnchorSize(sbBoxObj, 0.18, 0.12); // v79: masthead line (was 0.89, 0.28)
+        sbBoxObj.enabled = true; setPos(sbBoxObj, 0.89, 0.28); setAnchorSize(sbBoxObj, 0.16, 0.10); // v81: back to the right side (was 0.85, 0.88)
         if (script.buttonTexture) { setIcon(getImageComp(sbBoxObj), script.buttonTexture); } // v78: Morning Paper round ink button
         else { setBoxColor(getImageComp(sbBoxObj), INK); } // fallback: ink square
         // v33: SVG/PNG icon on top, if statsIconTexture is filled
         // (import stats-icon.png). Falls back to "S" below if not.
         if (script.statsIconTexture) {
             var sbIconObj = copyUnder(script.orthoCamera, script.templateBoxObj, "StatsIcon");
-            sbIconObj.enabled = true; setPos(sbIconObj, 0.85, 0.88); setAnchorSize(sbIconObj, 0.18 * 0.65, 0.12 * 0.65); // v79: masthead line
+            sbIconObj.enabled = true; setPos(sbIconObj, 0.89, 0.28); setAnchorSize(sbIconObj, 0.16 * 0.65, 0.10 * 0.65); // v81: back to the right side
             setIcon(getImageComp(sbIconObj), script.statsIconTexture);
         }
     }
@@ -1632,7 +1633,7 @@ function bindKeys() {
 function onStart() {
     boxColorWorks = testBoxColor();
     print("AutoBuild: box colour cloning works = " + boxColorWorks);
-    print("AutoBuild: v80 loaded (Ocean)");
+    print("AutoBuild: v81 loaded (Ocean)");
     loadStats();
     if (buildBoard()) {
         var dl = datelineString();
