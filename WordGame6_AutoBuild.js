@@ -1,4 +1,5 @@
-// WordGame6_AutoBuild_v81.js - Lens Studio (classic JavaScript)
+// WordGame6_AutoBuild_v82.js - Lens Studio (classic JavaScript)
+// v82 2026-11-09: three phone fixes (mustafa's screenshots) — intro body split into shorter lines + font 17 so it fits the card; ENTER font 30 -> 22 so it fits the pill; share line font 16 -> 20; loss sub-line no longer reveals the word ('Better luck tomorrow!' instead of 'The word was ...').
 // v81 2026-11-08: Rules/Stats buttons back to their pre-v79 positions (right side, stacked) — mustafa's call. Nothing else changes from v80.
 // v80 2026-11-08: OCEAN theme (mustafa picked it, Morning Paper looked cheap). Navy #0C2A43, teal #2A9D8F, gold #E9C46A. Banner fix: title/rule/dateline hide on game over, banner moves to Y 0.84 clear of the grid (was 0.58, overlapped row 1 so letters showed through it).
 // v44 2026-11-07: FRESH build (user deleted all textures).
@@ -1008,7 +1009,7 @@ function buildBoard() {
             setPos(shareTextObj, 0, -0.42);
             setAnchorSize(shareTextObj, 1.4, 0.08);
             var shareText = getTextComp(shareTextObj);
-            if (shareText) { setTextSize(shareText, 16); setBold(shareText, RED); noBg(shareText); shareText.textFill.color = RED; try { shareText.horizontalAlignment = 1; } catch (e) { } shareText.text = "Record & share it!"; }
+            if (shareText) { setTextSize(shareText, 20); setBold(shareText, RED); noBg(shareText); shareText.textFill.color = RED; try { shareText.horizontalAlignment = 1; } catch (e) { } shareText.text = "Record & share it!"; } // v82: font 20 (was 16, too small)
             shareTextObj.enabled = false;
         }
         gameOverTextObj.enabled = false;
@@ -1097,7 +1098,7 @@ function buildBoard() {
         if (kc) {
             kc.text = (letter === "BACK") ? (script.deleteIconTexture ? "" : "DEL") : letter; // v34: hide "DEL" when the icon is used
             if (letter === "ENTER") {
-                styleBlock(kc, 30); // v53: ENTER word a little bigger in the bigger pill (was 28)
+                styleBlock(kc, 22); // v82: ENTER fits inside the 0.34 pill (was 30, overflowed and got cut off at the screen edge)
                 setBold(kc, CREAM); // v78: Morning Paper cream ENTER on the ink pill
                 if (script.enterPillTexture) { noBg(kc); } // v35: the pill Image is the background
                 else { setBg(kc, INDIGO); } // fallback: Text pill
@@ -1303,9 +1304,9 @@ function buildBoard() {
         }
         introBodyObj = copyUnder(script.orthoCamera, script.templateMsgObj, "IntroBody");
         setPos(introBodyObj, 0, 0.05); // v79: Daily Edition (was 0.08)
-        setAnchorSize(introBodyObj, 1.15, 0.26); // v79: (was 0.30)
+        setAnchorSize(introBodyObj, 1.20, 0.26); // v82: wider so the shorter lines sit well inside the card (was 1.15)
         introBodyText = getTextComp(introBodyObj);
-        if (introBodyText) { setTextSize(introBodyText, 19); noBg(introBodyText); introBodyText.textFill.color = BODY_INK; try { introBodyText.horizontalAlignment = 1; } catch (e) { } introBodyText.text = "Guess the 6-letter word in 5 tries!\n\nNew word every 24 hours.\nCome back tomorrow for the next one!"; } // v79: Daily Edition
+        if (introBodyText) { setTextSize(introBodyText, 17); noBg(introBodyText); introBodyText.textFill.color = BODY_INK; try { introBodyText.horizontalAlignment = 1; } catch (e) { } introBodyText.text = "Guess the 6-letter word\nin 5 tries!\n\nNew word every 24 hours.\nCome back tomorrow!"; } // v82: shorter lines + font 17 so the text fits inside the card (was one long line at 19, overflowed)
         introBodyObj.enabled = false;
         if (script.templateBoxObj && script.enterPillTexture) {
             introPlayBg = copyUnder(script.orthoCamera, script.templateBoxObj, "IntroPlayBg");
@@ -1467,7 +1468,7 @@ function restoreToday() {
         if (gameOverSubObj) { gameOverSubObj.enabled = true; }
         if (gameOverSubText) {
             if (gameWon) { gameOverSubText.text = (guesses.length === 1) ? "Solved in 1 try" : "Solved in " + guesses.length + " of 5 tries"; gameOverSubText.textFill.color = MUTED; }
-            else { gameOverSubText.text = "The word was " + target; gameOverSubText.textFill.color = RED; }
+            else { gameOverSubText.text = "Better luck tomorrow!"; gameOverSubText.textFill.color = RED; } // v82: never reveal the word after a loss (was "The word was " + target)
         }
         if (shareTextObj) { shareTextObj.enabled = true; }
         if (countdownBgObj) { countdownBgObj.enabled = true; }
@@ -1567,7 +1568,7 @@ function finishFlip() {
         if (gameOverTextObj) { gameOverTextObj.enabled = true; }
         if (gameOverBgObj) { gameOverBgObj.enabled = true; }
         if (gameOverSubObj) { gameOverSubObj.enabled = true; }
-        if (gameOverSubText) { gameOverSubText.text = "The word was " + target; gameOverSubText.textFill.color = RED; }
+        if (gameOverSubText) { gameOverSubText.text = "Better luck tomorrow!"; gameOverSubText.textFill.color = RED; } // v82: never reveal the word after a loss (was "The word was " + target)
         if (shareTextObj) { shareTextObj.enabled = true; }
         if (countdownBgObj) { countdownBgObj.enabled = true; }
         if (countdownTextObj) { countdownTextObj.enabled = true; }
@@ -1633,7 +1634,7 @@ function bindKeys() {
 function onStart() {
     boxColorWorks = testBoxColor();
     print("AutoBuild: box colour cloning works = " + boxColorWorks);
-    print("AutoBuild: v81 loaded (Ocean)");
+    print("AutoBuild: v82 loaded (Ocean)");
     loadStats();
     if (buildBoard()) {
         var dl = datelineString();
