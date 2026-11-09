@@ -1,4 +1,5 @@
-// WordGame6_AutoBuild_v82.js - Lens Studio (classic JavaScript)
+// WordGame6_AutoBuild_v83_REC.js - Lens Studio (classic JavaScript)
+// v83-REC 2026-11-09: RECORDING ONLY — NOT FOR PUBLISH. Non-daily mode so mustafa can record 4-5 Spotlight videos back-to-back. Fixed word order: PLANET, CASTLE, WINTER, GARDEN, BRIDGE (then repeats). ENTER restarts with the next word after game over. Does NOT touch the real daily save or stats. To go back to daily, push v82 again.
 // v82 2026-11-09: three phone fixes (mustafa's screenshots) — intro body split into shorter lines + font 17 so it fits the card; ENTER font 30 -> 22 so it fits the pill; share line font 16 -> 20; loss sub-line no longer reveals the word ('Better luck tomorrow!' instead of 'The word was ...').
 // v81 2026-11-08: Rules/Stats buttons back to their pre-v79 positions (right side, stacked) — mustafa's call. Nothing else changes from v80.
 // v80 2026-11-08: OCEAN theme (mustafa picked it, Morning Paper looked cheap). Navy #0C2A43, teal #2A9D8F, gold #E9C46A. Banner fix: title/rule/dateline hide on game over, banner moves to Y 0.84 clear of the grid (was 0.58, overlapped row 1 so letters showed through it).
@@ -723,6 +724,7 @@ function todayNumber() {
 // v75: persist today's game (progress + win/loss) so leaving
 // the lens and coming back does not restart it.
 function saveGame() {
+    if (REC_MODE) { return; } // v83-REC: never save - recording must not overwrite the real daily game
     if (!store) { return; }
     try {
         store.putInt("wordle_day", todayNumber());
@@ -1330,7 +1332,26 @@ function buildBoard() {
     return true;
 }
 
+// v83-REC: recording mode — fixed word order, no daily lock.
+var REC_MODE = true; // RECORDING ONLY - the daily build (v82) has this false/absent
+var REC_WORDS = ["PLANET", "CASTLE", "WINTER", "GARDEN", "BRIDGE"]; // the 5 recording words, in order
+var recIdx = 0; // in-memory fallback if storage is unavailable
+function getRecIdx() {
+    try { if (store) { var v = store.getInt("wordle_rec_idx"); if (v >= 0 && v < 1000) { return v; } } } catch (e) { }
+    return recIdx;
+}
+function setRecIdx(v) {
+    recIdx = v;
+    try { if (store) { store.putInt("wordle_rec_idx", v); } } catch (e) { }
+}
 function pickWord() {
+    // v83-REC: fixed recording order, not the daily word.
+    if (REC_MODE) {
+        var idx = getRecIdx();
+        var w = REC_WORDS[idx % REC_WORDS.length];
+        setRecIdx(idx + 1);
+        return w;
+    }
     var list = script.wordList;
     var clean = [];
     for (var i = 0; i < list.length; i++) {
@@ -1446,6 +1467,7 @@ function setMessage(text) {
 // screen for it, WITHOUT re-recording the win/loss.
 // Returns true if a game for today was restored.
 function restoreToday() {
+    if (REC_MODE) { return false; } // v83-REC: no daily restore - every open is a fresh recording game
     if (!loadGame()) { return false; }
     target = pickWord(); // same daily word
     setKeyboardVisible(!gameOver);
@@ -1544,7 +1566,7 @@ function finishFlip() {
     if (guesses[guesses.length - 1] === target) {
         gameOver = true;
         gameWon = true;
-        recordWin();
+        if (!REC_MODE) { recordWin(); } // v83-REC: recording games don't count toward real stats
         setKeyboardVisible(false); // v68: whole keyboard disappears on game over
         setMastheadVisible(false); // v80: banner takes the top on game over
         if (gameOverText) { gameOverText.text = "You won!"; gameOverText.textFill.color = BLUE; } // v80: Ocean teal win
@@ -1554,14 +1576,14 @@ function finishFlip() {
         if (gameOverSubText) { gameOverSubText.text = (guesses.length === 1) ? "Solved in 1 try" : "Solved in " + guesses.length + " of 5 tries"; gameOverSubText.textFill.color = MUTED; }
         if (shareTextObj) { shareTextObj.enabled = true; }
         waveRow = guesses.length - 1; waveCol = 0; waveTimer = 0; waveActive = true;
-        if (countdownBgObj) { countdownBgObj.enabled = true; }
-        if (countdownTextObj) { countdownTextObj.enabled = true; }
-        if (countdownText) { countdownText.text = "Next word in " + nextWordIn(); }
+        if (!REC_MODE && countdownBgObj) { countdownBgObj.enabled = true; } // v83-REC: no countdown in recording (ENTER restarts immediately)
+        if (!REC_MODE && countdownTextObj) { countdownTextObj.enabled = true; }
+        if (!REC_MODE && countdownText) { countdownText.text = "Next word in " + nextWordIn(); }
         panelOpen = "stats"; updateStatsRow(); setStatsPanelVisible(true);
     } else if (guesses.length === 5) { // v32: 5 guesses, not 6
         gameOver = true;
         gameWon = false;
-        recordLoss();
+        if (!REC_MODE) { recordLoss(); } // v83-REC: recording games don't count toward real stats
         setKeyboardVisible(false); // v68: whole keyboard disappears on game over
         setMastheadVisible(false); // v80: banner takes the top on game over
         if (gameOverText) { gameOverText.text = "Game over!"; gameOverText.textFill.color = INK; } // v80: Ocean navy loss
@@ -1570,9 +1592,9 @@ function finishFlip() {
         if (gameOverSubObj) { gameOverSubObj.enabled = true; }
         if (gameOverSubText) { gameOverSubText.text = "Better luck tomorrow!"; gameOverSubText.textFill.color = RED; } // v82: never reveal the word after a loss (was "The word was " + target)
         if (shareTextObj) { shareTextObj.enabled = true; }
-        if (countdownBgObj) { countdownBgObj.enabled = true; }
-        if (countdownTextObj) { countdownTextObj.enabled = true; }
-        if (countdownText) { countdownText.text = "Next word in " + nextWordIn(); }
+        if (!REC_MODE && countdownBgObj) { countdownBgObj.enabled = true; } // v83-REC: no countdown in recording (ENTER restarts immediately)
+        if (!REC_MODE && countdownTextObj) { countdownTextObj.enabled = true; }
+        if (!REC_MODE && countdownText) { countdownText.text = "Next word in " + nextWordIn(); }
         panelOpen = "stats"; updateStatsRow(); setStatsPanelVisible(true);
     } else {
         // v67: message pill removed - nothing to clear.
@@ -1586,6 +1608,7 @@ function onKey(letter) {
     var ki = -1;
     for (var k = 0; k < KEY_LAYOUT.length; k++) { if (KEY_LAYOUT[k][0] === letter) { ki = k; break; } }
     if (ki >= 0) { popKeyIdx = ki; popKeyTimer = 0.08; setKeyScale(ki, 0.92); }
+    if (REC_MODE && letter === "ENTER" && gameOver) { newGame(); return; } // v83-REC: ENTER starts the next recording word after game over (daily build: ENTER does nothing)
     if (letter === "ENTER") { submitGuess(); }
     else if (letter === "BACK") {
         if (!gameOver && current.length > 0) {
@@ -1634,7 +1657,7 @@ function bindKeys() {
 function onStart() {
     boxColorWorks = testBoxColor();
     print("AutoBuild: box colour cloning works = " + boxColorWorks);
-    print("AutoBuild: v82 loaded (Ocean)");
+    print("AutoBuild: v83-REC loaded (Ocean RECORDING - not for publish)");
     loadStats();
     if (buildBoard()) {
         var dl = datelineString();
