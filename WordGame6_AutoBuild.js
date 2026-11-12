@@ -1,4 +1,5 @@
-// WordGame6_AutoBuild_v82.js - Lens Studio (classic JavaScript)
+// WordGame6_AutoBuild_v83.js - Lens Studio (classic JavaScript)
+// v83 2026-11-12: LEADERBOARD (mustafa's yes) — Snap's built-in Leaderboard, Friends / Daily reset / Ascending (fewer guesses = better). Submits guesses-used at game over (win: 1-5, loss: 6) via Leaderboard.submitScoreAsync, once per day. This is the documented precondition for Snap's 'beat your score' notification, and the best-supported route to DailyGuessIt-style daily notifications — daily drop itself is NOT guaranteed, Snap decides it. OPTIONAL input: if leaderboardComp is left empty, the game plays exactly as v82 (no crash, no UI change). LENS STUDIO STEP (mustafa, in Lens Studio only, not in this file): Asset Library > Custom Components > install 'Leaderboard Core', add it under Orthographic Camera, drag it into this script's 'leaderboardComp' input, and turn OFF its Auto Initialize (the script initialises it with Friends/Daily/Ascending). No other change in v83 — same Ocean theme, same daily word, same board/keyboard/stats.
 // v82 2026-11-09: three phone fixes (mustafa's screenshots) — intro body split into shorter lines + font 17 so it fits the card; ENTER font 30 -> 22 so it fits the pill; share line font 16 -> 20; loss sub-line no longer reveals the word ('Better luck tomorrow!' instead of 'The word was ...').
 // v81 2026-11-08: Rules/Stats buttons back to their pre-v79 positions (right side, stacked) — mustafa's call. Nothing else changes from v80.
 // v80 2026-11-08: OCEAN theme (mustafa picked it, Morning Paper looked cheap). Navy #0C2A43, teal #2A9D8F, gold #E9C46A. Banner fix: title/rule/dateline hide on game over, banner moves to Y 0.84 clear of the grid (was 0.58, overlapped row 1 so letters showed through it).
@@ -126,6 +127,7 @@
 // @input Asset.Texture introPanelTexture // v79: Daily Edition - tall cream intro card (intro-panel-cream-v79.png)
 // @input Asset.Texture bannerTexture // v79: Daily Edition - cream game-over banner (banner-cream-v79.png)
 // @input SceneObject templateMsgObj
+// @input Component.ScriptComponent leaderboardComp // v83: OPTIONAL Leaderboard Core (see header). Leave empty = v82 behaviour, game still works.
 // @input string[] wordList = {"PLANET", "GARDEN", "BRIDGE", "CASTLE", "MARKET", "SILVER", "GOLDEN", "WINTER", "SUMMER", "SPRING", "AUTUMN", "BANANA", "ORANGE", "PURPLE", "JUNGLE", "DESERT", "ISLAND", "BREEZE", "MEADOW", "FOREST", "HARBOR", "LETTER", "NUMBER", "PEOPLE", "FAMILY", "FRIEND", "SCHOOL", "TRAVEL", "DANCER", "SINGER", "PLAYER", "WINNER", "SUNSET", "STARRY", "CLOUDY", "FLOWER", "POCKET", "BUTTON", "WINDOW", "PENCIL", "HAMMER", "LADDER", "ROCKET", "DRAGON", "WIZARD", "KNIGHT", "PIRATE", "SAILOR", "FARMER", "DOCTOR", "LAWYER", "WORKER", "DRIVER", "RUNNER", "JUMPER", "HUNTER", "FISHER", "ARTIST", "WRITER", "READER", "LISTEN"}
 
 var ROWS = 5; // v32: 5 guesses, not 6
@@ -394,6 +396,11 @@ var gamesPlayed = 0;
 var gamesWon = 0;
 var currentStreak = 0;
 var bestStreak = 0;
+
+// v83: LEADERBOARD state. lbInitialized = Snap leaderboard ready; lbSubmittedToday = score already sent for today's game (in-memory + Persistent Storage guard, so a restore never double-submits).
+var lbInitialized = false;
+var lbSubmittedToday = false;
+var LB_NAME = "wordly-daily";
 
 var target = "";
 var guesses = [];
@@ -705,6 +712,75 @@ function saveStats() {
         store.putInt("wordle_streak", currentStreak);
         store.putInt("wordle_bestStreak", bestStreak);
     } catch (e) { print("AutoBuild: could not save stats"); }
+}
+// v83: LEADERBOARD — Snap's built-in system (developers.snap.com/lens-studio/features/games/leaderboard).
+// Init: Friends / Daily reset / Ascending (fewer guesses wins), start anchor 11/09/2026 (WORDLY publish date).
+// Submit: win = guesses used (1-5), loss = 6 (worse than any win). Once per day, game-over only.
+// Everything is guarded: if the component is missing, enums are missing, or submit fails, the game
+// keeps playing exactly as v82 — print() only. No leaderboard UI is shown by this script (Core is
+// logic-only); if mustafa adds the full UI Leaderboard component instead, its Side Switcher /
+// Score Widget are hidden here so the WORDLY board is untouched.
+function initLeaderboard() {
+    try {
+        var lb = null;
+        try { lb = script.leaderboardComp; } catch (e1) { lb = null; }
+        if (!lb) { print("AutoBuild: leaderboard not wired (leaderboardComp empty) - playing as v82"); return; }
+        if (!lb.initializeWithOptions) { print("AutoBuild: leaderboard component has no initializeWithOptions - skipping init"); return; }
+        var userType = null;
+        var ordering = null;
+        var resetDay = null;
+        try { if (typeof Leaderboard !== "undefined" && Leaderboard.UsersType) { userType = Leaderboard.UsersType.Friends; } } catch (e2) { }
+        try { if (typeof Leaderboard !== "undefined" && Leaderboard.OrderingType) { ordering = Leaderboard.OrderingType.Ascending; } } catch (e3) { }
+        try { if (lb.ScoreResetIntervalOption) { resetDay = lb.ScoreResetIntervalOption.Day; } } catch (e4) { }
+        try { if (!resetDay && typeof Leaderboard !== "undefined" && Leaderboard.ScoreResetIntervalOption) { resetDay = Leaderboard.ScoreResetIntervalOption.Day; } } catch (e5) { }
+        if (userType === null || ordering === null || resetDay === null) {
+            print("AutoBuild: leaderboard enums not available - relying on Inspector Auto Initialize, submit will still be attempted");
+            lbInitialized = true;
+            return;
+        }
+        lb.initializeWithOptions({
+            name: LB_NAME,
+            userType: userType,
+            scoreOrdering: ordering,
+            userLimit: 50,
+            scoreResetInterval: resetDay,
+            useTimer: false,
+            leaderboardStartDate: "11/09/2026"
+        });
+        lbInitialized = true;
+        // Hide any UI the full Leaderboard component would show - WORDLY board stays untouched.
+        try { if (lb.getSideSwitcher) { var ss = lb.getSideSwitcher(); if (ss && ss.hide) { ss.hide(); } } } catch (e6) { }
+        try { if (lb.hideScoreWidget) { lb.hideScoreWidget(); } } catch (e7) { }
+        try { if (lb.hide) { lb.hide(); } } catch (e8) { }
+        print("AutoBuild: leaderboard initialised (wordly-daily, Friends, Daily, Ascending)");
+    } catch (e) { print("AutoBuild: leaderboard init failed - playing as v82"); }
+}
+function submitLeaderboardScore() {
+    try {
+        if (!lbInitialized) { return; }
+        var lb = null;
+        try { lb = script.leaderboardComp; } catch (e1) { lb = null; }
+        if (!lb) { return; }
+        if (lbSubmittedToday) { return; }
+        if (!gameOver) { return; }
+        // Persistent guard: one submit per day, even if the game is restored after closing the lens.
+        try { if (store && store.getInt("wordle_lb_day") === todayNumber()) { lbSubmittedToday = true; return; } } catch (e2) { }
+        var score = gameWon ? guesses.length : 6;
+        if (!(score >= 1 && score <= 6)) { return; }
+        lbSubmittedToday = true;
+        var markSubmitted = function () {
+            try { if (store) { store.putInt("wordle_lb_day", todayNumber()); } } catch (e3) { }
+            print("AutoBuild: leaderboard score submitted: " + score);
+        };
+        try {
+            if (lb.submitScoreAsync) {
+                var p = lb.submitScoreAsync(score);
+                if (p && p.then) {
+                    p.then(function () { markSubmitted(); }).catch(function () { lbSubmittedToday = false; print("AutoBuild: leaderboard submit failed - will retry next open"); });
+                } else { markSubmitted(); }
+            } else if (lb.submitScore) { lb.submitScore(score); markSubmitted(); }
+        } catch (e4) { lbSubmittedToday = false; print("AutoBuild: leaderboard submit error"); }
+    } catch (e) { print("AutoBuild: leaderboard submit error"); }
 }
 function recordWin() {
     gamesPlayed++; gamesWon++; currentStreak++;
@@ -1476,6 +1552,7 @@ function restoreToday() {
         if (countdownText) { countdownText.text = "Next word in " + nextWordIn(); }
         panelOpen = "stats"; updateStatsRow(); setStatsPanelVisible(true);
     }
+    if (gameOver) { submitLeaderboardScore(); } // v83: restored finish - submit once, guard stops re-submit
     setMastheadVisible(!gameOver); // v80: hide the masthead if the restored game is over (banner takes the top)
     setIntroVisible(false); // v75: no intro - the player already started today
     return true;
@@ -1486,6 +1563,7 @@ function newGame() {
     current = "";
     gameOver = false;
     gameWon = false;
+    lbSubmittedToday = false; // v83: new day, new game - score not submitted yet
     setMastheadVisible(true); // v80: masthead back for the new game
     setKeyboardVisible(true); // v68: keyboard back for the new game
     if (gameOverTextObj) { gameOverTextObj.enabled = false; }
@@ -1545,6 +1623,7 @@ function finishFlip() {
         gameOver = true;
         gameWon = true;
         recordWin();
+        submitLeaderboardScore(); // v83: win in guesses.length tries (1-5)
         setKeyboardVisible(false); // v68: whole keyboard disappears on game over
         setMastheadVisible(false); // v80: banner takes the top on game over
         if (gameOverText) { gameOverText.text = "You won!"; gameOverText.textFill.color = BLUE; } // v80: Ocean teal win
@@ -1562,6 +1641,7 @@ function finishFlip() {
         gameOver = true;
         gameWon = false;
         recordLoss();
+        submitLeaderboardScore(); // v83: loss = 6 (worse than any win)
         setKeyboardVisible(false); // v68: whole keyboard disappears on game over
         setMastheadVisible(false); // v80: banner takes the top on game over
         if (gameOverText) { gameOverText.text = "Game over!"; gameOverText.textFill.color = INK; } // v80: Ocean navy loss
@@ -1634,8 +1714,9 @@ function bindKeys() {
 function onStart() {
     boxColorWorks = testBoxColor();
     print("AutoBuild: box colour cloning works = " + boxColorWorks);
-    print("AutoBuild: v82 loaded (Ocean)");
+    print("AutoBuild: v83 loaded (Ocean + Leaderboard)");
     loadStats();
+    initLeaderboard(); // v83: init before restoreToday/newGame so a restored finish can submit too
     if (buildBoard()) {
         var dl = datelineString();
         if (datelineText) { datelineText.text = dl; }
